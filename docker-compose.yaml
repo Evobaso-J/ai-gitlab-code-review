@@ -1,0 +1,11 @@
+version: "4"
+
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - published: 9655
+        target: 80
+    env_file:
+      - .env
