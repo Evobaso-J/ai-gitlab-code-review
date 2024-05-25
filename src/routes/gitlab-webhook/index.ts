@@ -2,7 +2,12 @@ import { WebhookPushEventSchema, WebhookMergeRequestEventSchema, CommitDiffSchem
 import { FastifyPluginAsync } from "fastify";
 import { buildAnswer, buildPrompt } from "./prompt.js";
 import { OpenAI } from "openai";
-import { ChatCompletion } from "openai/resources/index.mjs";
+
+export type FetchHeaders = {
+    'private-token': string;
+}
+export type CommentPayload = { "body": string } | { note: string } | undefined;
+
 
 const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
 
