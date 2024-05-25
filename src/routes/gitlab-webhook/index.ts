@@ -1,7 +1,8 @@
-import { WebhookPushEventSchema, WebhookMergeRequestEventSchema, CommitDiffSchema } from "@gitbeaker/rest";
+import { WebhookPushEventSchema, WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
 import { FastifyPluginAsync } from "fastify";
 import { buildAnswer, buildPrompt } from "./prompt.js";
 import { OpenAI } from "openai";
+import { fetchCommitDiff, fetchPreEditFiles, generateAICompletion, postAIComment } from "./utils.js";
 
 export type FetchHeaders = {
     'private-token': string;
@@ -28,98 +29,59 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
             reply.code(400).send({ error: 'Unsupported event type' });
             return;
         }
-        const headers = { 'private-token': gitlabToken };
-        let commentUrl = "";
+        const headers: FetchHeaders = { 'private-token': gitlabToken };
         let commentPayload: { "body": string } | { note: string } | undefined;
+        let commentUrl: URL = new URL(gitlabUrl);
 
-        if (payload.object_kind === 'push') {
-            const {
-                project_id: projectId,
-                after: commitSha,
-            } = payload;
-            const commitUrl = `${gitlabUrl}/projects/${projectId}/repository/commits/${commitSha}/diff`;
-
-            let changes: CommitDiffSchema[] | undefined;
-            try {
-                changes = (await (
-                    await fetch(commitUrl, { headers })
-                ).json()) as CommitDiffSchema[];
-            } catch (error) {
-                fastify.log.error("Failed to fetch commit diff", error);
-            }
-
-            if (!changes) {
-                fastify.log.error("Failed to fetch commit diff");
-                reply.code(500).send({ error: "Internal server error" });
-                return;
-            }
-
-            // transform the changes into a list of old file urls for a fetch request
-            const oldFilesRequestUrls = changes.map(path =>
-                `${gitlabUrl}/projects/${projectId}/repository/files/${encodeURIComponent(path.old_path)}/raw`
-            );
-
-            // fetch the old files
-
-            let oldFiles: string[] = [];
-            try {
-                oldFiles = await Promise.all(
-                    oldFilesRequestUrls.map(async url => {
-                        const response = await fetch(url, { headers });
-                        return response.text();
-                    })
-                );
-            } catch (error) {
-                fastify.log.error("Failed to fetch old files", error);
-            }
-
-            if (!oldFiles) {
-                fastify.log.error("Failed to fetch old files");
-                reply.code(500).send({ error: "Internal server error" });
-                return;
-            }
-
-            commentUrl = `${gitlabUrl}/projects/${projectId}/merge_requests/${commitSha}/notes`;
-
-            const { messages } = buildPrompt(oldFiles, changes);
-
-            const openai = new OpenAI({
-                apiKey: fastify.env.OPENAI_API_KEY,
-            });
-
-            let completion: ChatCompletion | Error | undefined;
-            try {
-                completion = await openai.chat.completions.create(
-                    {
-                        model: fastify.env.AI_MODEL,
-                        temperature: 0.7,
-                        stream: false,
-                        messages
-                    }
-                )
-
-            } catch (error) {
-                if (error instanceof Error) {
-                    completion = error;
-                }
-                fastify.log.error("Failed to generate completion", error);
-            }
-
-            const answer = buildAnswer(completion);
-            commentPayload = { note: answer };
-        }
-
-        // Post the comment
         try {
-            await fetch(commentUrl, {
-                method: "POST",
-                headers,
-                body: JSON.stringify(commentPayload),
-            });
+            if (payload.object_kind === 'push') {
+                const {
+                    project_id: projectId,
+                    after: commitSha,
+                } = payload;
+
+                const gitLabBaseUrl = new URL(`${gitlabUrl}/projects/${projectId}`);
+                commentUrl = new URL(`merge_requests/${commitSha}/notes`, gitLabBaseUrl);
+
+                // Get the commit diff
+                const commitUrl = new URL(`repository/commits/${commitSha}/diff`, gitLabBaseUrl);
+
+                const changes = await fetchCommitDiff(commitUrl, headers);
+                if (changes instanceof Error) throw changes;
+
+                // transform the changes into a list of old file urls for a fetch request
+                const oldFilesRequestUrls = changes.map(path =>
+                    new URL(`repository/files/${encodeURIComponent(path.old_path)}/raw`, gitLabBaseUrl)
+                );
+
+                // Fetch files before the edit
+                const oldFiles = await fetchPreEditFiles(oldFilesRequestUrls, headers);
+                if (oldFiles instanceof Error) throw oldFiles;
+
+                const messages = buildPrompt(oldFiles, changes);
+
+                const openai = new OpenAI({
+                    apiKey: fastify.env.OPENAI_API_KEY,
+                });
+
+                const completion = await generateAICompletion(messages, openai, fastify.env.AI_MODEL);
+                if (completion instanceof Error) throw completion;
+
+
+                const answer = buildAnswer(completion);
+                commentPayload = { note: answer };
+            }
+
+            // Post the comment
+            const aiComment = postAIComment(new URL(commentUrl), headers, commentPayload);
+            if (aiComment instanceof Error) throw aiComment;
+
         } catch (error) {
-            fastify.log.error("Failed to post comment", error);
-            reply.code(500).send({ error: "Internal server error" });
-            return;
+            if (error instanceof Error) {
+                fastify.log.error(error.message, error);
+                reply.code(500).send(error);
+                return;
+            }
         }
 
         reply.code(200).send({ status: "OK" });
