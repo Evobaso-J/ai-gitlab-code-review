@@ -1,21 +1,9 @@
 import { CommitDiffSchema } from "@gitbeaker/rest";
-import { CommentPayload, FetchHeaders } from "./index.js";
-import { BaseError } from "../../config/errors.js";
 import { ChatCompletion, ChatModel } from "openai/resources/index.mjs";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/src/resources/index.js";
+import { FetchHeaders, CommentPayload, GitLabError, OpenAIError } from "./types.js";
 
-type GitLabErrorName =
-    | "MISSING_DIFF"
-    | "MISSING_OLD_FILES"
-    | "FAILED_TO_POST_COMMENT"
-
-type OpenAIErrorName =
-    | "MISSING_AI_COMPLETION"
-
-
-class GitLabError extends BaseError<GitLabErrorName> { }
-class OpenAIError extends BaseError<OpenAIErrorName> { }
 
 export async function fetchCommitDiff(commitUrl: URL, headers: FetchHeaders): Promise<CommitDiffSchema[] | GitLabError> {
     const changes = (await (
