@@ -118,15 +118,15 @@ export async function generateAICompletion(messages: ChatCompletionMessageParam[
 }
 
 type PostAICommentParams = {
-    commitSha: string,
+    mergeRequestIid: string,
 }
 type PostAICommentResult = void | GitLabError;
 export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAICommentResult> = async ({
     gitLabBaseUrl,
     headers,
-    commitSha,
+    mergeRequestIid,
 }, commentPayload: CommentPayload): Promise<void | GitLabError> => {
-    const commentUrl = new URL(`merge_requests/${commitSha}/notes`, gitLabBaseUrl);
+    const commentUrl = new URL(`merge_requests/${mergeRequestIid}/notes`, gitLabBaseUrl);
 
     const aiComment = fetch(commentUrl, {
         method: "POST",

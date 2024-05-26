@@ -43,7 +43,7 @@ export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = asyn
     const answer = buildAnswer(completion);
 
     return {
-        commitSha,
+        mergeRequestIid: commitSha,
         gitLabBaseUrl,
         commentPayload: { note: answer },
     }

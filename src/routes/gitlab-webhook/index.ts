@@ -2,7 +2,7 @@ import { FastifyPluginAsync } from "fastify";
 import { OpenAI } from "openai";
 import { postAIComment } from "./utils.js";
 import { FetchHeaders, GitLabError, GitLabWebhookHandler, SupportedWebhookEvent } from "./types.js";
-import { handlePushHook } from "./pushHook.js";
+import { handlePushHook } from "./hookHandlers/push.js";
 
 
 
@@ -26,7 +26,7 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
         try {
             let result: Awaited<ReturnType<GitLabWebhookHandler>> = new GitLabError({
                 name: "UNSUPPORTED_EVENT_TYPE",
-                message: "Unsupported event type",
+                message: `Webhook events of type "${payload.object_kind}" are not supported`,
             });
             if (payload.object_kind === 'push') {
                 result = await handlePushHook(payload, {
@@ -37,9 +37,14 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
                 })
             }
             if (result instanceof Error) throw result;
+            const { commentPayload, gitLabBaseUrl, mergeRequestIid } = result;
 
             // Post the comment
-            const aiComment = postAIComment(new URL(result.commentUrl), headers, result.commentPayload);
+            const aiComment = postAIComment({
+                gitLabBaseUrl,
+                mergeRequestIid,
+                headers,
+            }, commentPayload);
             if (aiComment instanceof Error) throw aiComment;
 
         } catch (error) {

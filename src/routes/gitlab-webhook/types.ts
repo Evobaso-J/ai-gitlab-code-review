@@ -13,7 +13,7 @@ export type CommentPayload = { "body": string } | { note: string } | undefined;
 // #region Webhook Handler
 export type SupportedWebhookEvent = WebhookPushEventSchema | WebhookMergeRequestEventSchema;
 export type WebhookHandlerResult<T extends SupportedWebhookEvent> = {
-    commitSha: string;
+    mergeRequestIid: string;
     commentPayload: ExtractPayloadTypeFromEvent<T>;
     gitLabBaseUrl: URL;
 }
