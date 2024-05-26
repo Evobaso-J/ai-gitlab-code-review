@@ -13,8 +13,9 @@ export type CommentPayload = { "body": string } | { note: string } | undefined;
 // #region Webhook Handler
 export type SupportedWebhookEvent = WebhookPushEventSchema | WebhookMergeRequestEventSchema;
 export type WebhookHandlerResult<T extends SupportedWebhookEvent> = {
-    commentUrl: URL;
+    commitSha: string;
     commentPayload: ExtractPayloadTypeFromEvent<T>;
+    gitLabBaseUrl: URL;
 }
 
 type ExtractPayloadTypeFromEvent<T extends SupportedWebhookEvent> =

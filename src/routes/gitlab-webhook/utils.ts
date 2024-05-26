@@ -1,11 +1,25 @@
-import { CommitDiffSchema } from "@gitbeaker/rest";
+import { CommitDiffSchema, RepositoryCompareSchema } from "@gitbeaker/rest";
 import { ChatCompletion, ChatModel } from "openai/resources/index.mjs";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/src/resources/index.js";
 import { FetchHeaders, CommentPayload, GitLabError, OpenAIError } from "./types.js";
 
+type GitLabFetchFunction<URLParams extends Record<string, any> = {}, Result = GitLabError> = (fetchParams: {
+    gitLabBaseUrl: URL,
+    headers: FetchHeaders,
+} & URLParams, ...rest: any[]) => Promise<Result>
 
-export async function fetchCommitDiff(commitUrl: URL, headers: FetchHeaders): Promise<CommitDiffSchema[] | GitLabError> {
+type FetchCommitParams = {
+    commitSha: string,
+}
+type FetchCommitResult = CommitDiffSchema[] | GitLabError;
+export const fetchCommitDiff: GitLabFetchFunction<FetchCommitParams, FetchCommitResult> = async ({
+    gitLabBaseUrl,
+    headers,
+    commitSha,
+}) => {
+    const commitUrl = new URL(`repository/commits/${commitSha}/diff`, gitLabBaseUrl);
+
     const changes = (await (
         await fetch(commitUrl, { headers })
     ).json()) as CommitDiffSchema[];
@@ -20,7 +34,49 @@ export async function fetchCommitDiff(commitUrl: URL, headers: FetchHeaders): Pr
     return changes;
 }
 
-export async function fetchPreEditFiles(oldFilesRequestUrls: URL[], headers: FetchHeaders): Promise<string[] | GitLabError> {
+type FetchBranchParams = {
+    gitLabBaseUrl: URL,
+    targetBranch: string,
+    sourceBranch: string,
+}
+type FetchBranchResult = RepositoryCompareSchema | GitLabError;
+export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranchResult> = async ({
+    gitLabBaseUrl,
+    headers,
+    targetBranch,
+    sourceBranch
+}) => {
+    const compareUrl = new URL(`repository/compare`, gitLabBaseUrl);
+    compareUrl.searchParams.append('from', targetBranch);
+    compareUrl.searchParams.append('to', sourceBranch);
+
+    const branchDiff = (await (
+        await fetch(compareUrl, { headers })
+    ).json()) as RepositoryCompareSchema;
+
+    if (!branchDiff) {
+        return new GitLabError({
+            name: "MISSING_DIFF",
+            message: "Failed to fetch branch diff",
+        });
+    }
+
+    return branchDiff;
+}
+
+type FetchPreEditFilesParams = {
+    changesOldPaths: string[],
+}
+type FetchPreEditFilesResult = string[] | GitLabError;
+export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, FetchPreEditFilesResult> = async ({
+    gitLabBaseUrl,
+    headers,
+    changesOldPaths,
+}) => {
+    const oldFilesRequestUrls = changesOldPaths.map(path =>
+        new URL(`repository/files/${encodeURIComponent(path)}/raw`, gitLabBaseUrl)
+    );
+
     const oldFiles = await Promise.all(
         oldFilesRequestUrls.map(async (url) => {
             const file = await (
@@ -61,7 +117,17 @@ export async function generateAICompletion(messages: ChatCompletionMessageParam[
     return completion;
 }
 
-export async function postAIComment(commentUrl: URL, headers: FetchHeaders, commentPayload: CommentPayload): Promise<void | GitLabError> {
+type PostAICommentParams = {
+    commitSha: string,
+}
+type PostAICommentResult = void | GitLabError;
+export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAICommentResult> = async ({
+    gitLabBaseUrl,
+    headers,
+    commitSha,
+}, commentPayload: CommentPayload): Promise<void | GitLabError> => {
+    const commentUrl = new URL(`merge_requests/${commitSha}/notes`, gitLabBaseUrl);
+
     const aiComment = fetch(commentUrl, {
         method: "POST",
         headers,
