@@ -3,6 +3,7 @@ import { OpenAI } from "openai";
 import { postAIComment } from "./utils.js";
 import { FetchHeaders, GitLabError, GitLabWebhookHandler, SupportedWebhookEvent } from "./types.js";
 import { handlePushHook } from "./hookHandlers/push.js";
+import { handleMergeRequestHook } from "./hookHandlers/mergeRequest.js";
 
 
 
@@ -24,6 +25,14 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
         const headers: FetchHeaders = { 'private-token': fastify.env.GITLAB_TOKEN };
 
         try {
+            /**
+             * Each handler has to return a prompt. 
+             * The prompt is built by fetching:
+             * 
+             * 1. The changes in the branch
+             * 2. The files before the edit
+             */
+
             let result: Awaited<ReturnType<GitLabWebhookHandler>> = new GitLabError({
                 name: "UNSUPPORTED_EVENT_TYPE",
                 message: `Webhook events of type "${payload.object_kind}" are not supported`,
@@ -36,6 +45,15 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
                     openaiInstance,
                 })
             }
+            if (payload.object_kind === 'merge_request') {
+                result = await handleMergeRequestHook(payload, {
+                    AIModel,
+                    gitlabUrl,
+                    headers,
+                    openaiInstance,
+                })
+            }
+
             if (result instanceof Error) throw result;
             const { commentPayload, gitLabBaseUrl, mergeRequestIid } = result;
 
