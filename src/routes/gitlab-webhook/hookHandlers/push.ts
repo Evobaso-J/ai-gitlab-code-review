@@ -1,7 +1,7 @@
 import { WebhookPushEventSchema } from "@gitbeaker/rest";
-import { buildPrompt, buildAnswer } from "./prompt.js";
-import { GitLabWebhookHandler } from "./types.js";
-import { fetchCommitDiff, fetchPreEditFiles, generateAICompletion } from "./utils.js";
+import { buildPrompt, buildAnswer } from "../prompt.js";
+import { GitLabWebhookHandler } from "../types.js";
+import { fetchCommitDiff, fetchPreEditFiles, generateAICompletion } from "../utils.js";
 
 
 export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = async (pushEvent: WebhookPushEventSchema, {
@@ -18,18 +18,20 @@ export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = asyn
     const gitLabBaseUrl = new URL(`${gitlabUrl}/projects/${projectId}`);
 
     // Get the commit diff
-    const commitUrl = new URL(`repository/commits/${commitSha}/diff`, gitLabBaseUrl);
 
-    const changes = await fetchCommitDiff(commitUrl, headers);
+    const changes = await fetchCommitDiff({
+        gitLabBaseUrl,
+        commitSha,
+        headers
+    });
     if (changes instanceof Error) return changes;
 
-    // transform the changes into a list of old file urls for a fetch request
-    const oldFilesRequestUrls = changes.map(path =>
-        new URL(`repository/files/${encodeURIComponent(path.old_path)}/raw`, gitLabBaseUrl)
-    );
-
     // Fetch files before the edit
-    const oldFiles = await fetchPreEditFiles(oldFilesRequestUrls, headers);
+    const oldFiles = await fetchPreEditFiles({
+        gitLabBaseUrl,
+        changesOldPaths: changes.map(change => change.old_path),
+        headers
+    });
     if (oldFiles instanceof Error) return oldFiles;
 
     const messages = buildPrompt(oldFiles, changes);
@@ -41,7 +43,8 @@ export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = asyn
     const answer = buildAnswer(completion);
 
     return {
-        commentUrl: new URL(`merge_requests/${commitSha}/notes`, gitLabBaseUrl),
+        commitSha,
+        gitLabBaseUrl,
         commentPayload: { note: answer },
     }
 }
