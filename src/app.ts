@@ -1,6 +1,6 @@
 import * as path from 'path';
-import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload';
-import { FastifyPluginAsync } from 'fastify';
+import AutoLoad, { type AutoloadPluginOptions } from '@fastify/autoload';
+import type { FastifyPluginAsync } from 'fastify';
 import { fileURLToPath } from 'url'
 import { S } from 'fluent-json-schema';
 import { fastifyEnv } from '@fastify/env';

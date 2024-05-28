@@ -1,6 +1,6 @@
-import { WebhookPushEventSchema } from "@gitbeaker/rest";
+import type { WebhookPushEventSchema } from "@gitbeaker/rest";
 import { buildPrompt, buildAnswer } from "../prompt.js";
-import { GitLabWebhookHandler } from "../types.js";
+import type { GitLabWebhookHandler } from "../types.js";
 import { fetchCommitDiff, fetchPreEditFiles, generateAICompletion } from "../utils.js";
 
 

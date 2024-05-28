@@ -1,6 +1,6 @@
-import { WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
+import type { WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
 import { buildPrompt, buildAnswer } from "../prompt.js";
-import { GitLabWebhookHandler } from "../types.js";
+import type { GitLabWebhookHandler } from "../types.js";
 import { fetchBranchDiff, fetchPreEditFiles, generateAICompletion } from "../utils.js";
 
 

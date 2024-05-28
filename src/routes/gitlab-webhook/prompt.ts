@@ -1,5 +1,5 @@
-import { CommitDiffSchema } from "@gitbeaker/rest";
-import { ChatCompletionMessageParam, ChatCompletion } from "openai/resources/index.mjs";
+import type { CommitDiffSchema } from "@gitbeaker/rest";
+import type { ChatCompletionMessageParam, ChatCompletion } from "openai/resources/index.mjs";
 
 
 const QUESTIONS = `\n\nQuestions:\n

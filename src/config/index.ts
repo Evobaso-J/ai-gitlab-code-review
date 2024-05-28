@@ -1,4 +1,4 @@
-import { ChatModel } from "openai/resources/index.mjs";
+import type { ChatModel } from "openai/resources/index.mjs";
 
 export const AI_MODELS: ChatModel[] = [
     'gpt-4-turbo',

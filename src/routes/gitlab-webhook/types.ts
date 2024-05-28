@@ -1,6 +1,6 @@
-import { WebhookPushEventSchema, WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
+import type { WebhookPushEventSchema, WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
+import type { ChatModel } from "openai/resources/index.mjs";
 import OpenAI from "openai";
-import { ChatModel } from "openai/resources/index.mjs";
 import { BaseError } from "../../config/errors.js";
 
 export type FetchHeaders = {
