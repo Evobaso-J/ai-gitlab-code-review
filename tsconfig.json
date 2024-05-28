@@ -1,17 +1,23 @@
 {
   "extends": "fastify-tsconfig",
+
+  // Ref https://www.totaltypescript.com/tsconfig-cheat-sheet
   "compilerOptions": {
-    "outDir": "dist",
-    "sourceMap": true,
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "target": "ES2022",
-    "esModuleInterop": true,
-    "strict": true,
+    // Base
+    "allowJs": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+
+    // Strictness
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "noUnusedParameters": true,
+
+    // Typescript
+    "outDir": "dist",
+    "sourceMap": true
   },
   "include": ["src/**/*.ts", "**.d.ts"]
 }
