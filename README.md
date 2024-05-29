@@ -12,7 +12,7 @@ Gitlab AI Code Review is a JS script that leverages OpenAI's GPT-3.5-turbo to au
 
 - Docker
 - An OpenAI API key
-- A GitLab API token
+- A GitLab access token (can be generated in your [GitLab account settings](https://gitlab.com/-/user_settings/ssh_keys))
 
 ### Installation
 
@@ -23,7 +23,7 @@ https://github.com/Evobaso-J/ai-gitlab-code-review
 cd ai-code-reviewer
 ```
 
-2. Create an `.env` file and set the required environment variables:
+2. Create a `.env` file by copying the `.env.example` file and set the required environment variables:
 
 ```
 OPENAI_API_KEY=<your OpenAI API key>
@@ -31,6 +31,11 @@ GITLAB_TOKEN=<your GitLab API token>
 GITLAB_URL=https://gitlab.com/api/v4
 AI_MODEL=<an AI model from the ones supported by OpenAI>
 ```
+
+- `OPEN_API_KEY` is your ChatGPT account’s key
+- `GITLAB_TOKEN` is a personal gitlab account token. You can create it [here](https://gitlab.com/-/user_settings/personal_access_tokens) and it can be either be your own personal token or a token from a gitlab account created _ad hoc_
+- `GITLAB_URL` it’s the latest gitlab’s api version url, currently https://gitlab.com/api/v4
+- `AI_MODEL` is the model you want to use from OpenAI. You can use `gpt-3.5-turbo` or any other model supported by OpenAI.
 
 ### Docker
 
