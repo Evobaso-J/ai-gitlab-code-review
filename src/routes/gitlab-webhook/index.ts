@@ -2,8 +2,7 @@ import type { FastifyPluginAsync, RequestParamsDefault, RequestQuerystringDefaul
 import { OpenAI } from "openai";
 import { postAIComment } from "./utils.js";
 import { GitLabError, type FetchHeaders, type GitLabWebhookHandler, type SupportedWebhookEvent } from "./types.js";
-import { handlePushHook } from "./hookHandlers/push.js";
-import { handleMergeRequestHook } from "./hookHandlers/mergeRequest.js";
+import { handlePushHook, handleMergeRequestHook } from "./hookHandlers.js";
 
 
 type GitLabWebhookRequest = {
