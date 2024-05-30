@@ -9,7 +9,9 @@ type GitLabWebhookRequest = {
     Body?: SupportedWebhookEvent;
     Querystring?: RequestQuerystringDefault;
     Params?: RequestParamsDefault;
-    Headers?: FetchHeaders;
+    Headers?: {
+        'x-gitlab-token': string
+    };
 }
 
 const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
@@ -19,8 +21,7 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
             apiKey: fastify.env.OPENAI_API_KEY,
         });
         const AIModel = fastify.env.AI_MODEL;
-
-        if (reqHeaders['X-Gitlab-Token'] !== fastify.env.GITLAB_TOKEN) {
+        if (reqHeaders['x-gitlab-token'] !== fastify.env.GITLAB_TOKEN) {
             reply.code(401).send({ error: 'Unauthorized' });
             return;
         }
