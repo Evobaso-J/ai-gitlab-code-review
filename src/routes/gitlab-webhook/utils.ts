@@ -24,7 +24,7 @@ export const fetchCommitDiff: GitLabFetchFunction<FetchCommitParams, FetchCommit
         await fetch(commitUrl, { headers })
     ).json()) as CommitDiffSchema[];
 
-    if (!changes?.length) {
+    if (changes instanceof Error) {
         return new GitLabError({
             name: "MISSING_DIFF",
             message: "Failed to fetch commit diff",
@@ -54,7 +54,7 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
         await fetch(compareUrl, { headers })
     ).json()) as RepositoryCompareSchema;
 
-    if (!branchDiff) {
+    if (branchDiff instanceof Error) {
         return new GitLabError({
             name: "MISSING_DIFF",
             message: "Failed to fetch branch diff",
@@ -87,7 +87,7 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
         })
     );
 
-    if (!oldFiles.length) {
+    if (oldFiles instanceof Error) {
         return new GitLabError({
             name: "MISSING_OLD_FILES",
             message: "Failed to fetch old files",
@@ -107,7 +107,7 @@ export async function generateAICompletion(messages: ChatCompletionMessageParam[
         }
     )
 
-    if (!completion) {
+    if (completion instanceof Error) {
         return new OpenAIError({
             name: "MISSING_AI_COMPLETION",
             message: "Failed to generate AI completion",
@@ -134,7 +134,7 @@ export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAIComme
         body: JSON.stringify(commentPayload),
     });
 
-    if (!aiComment) {
+    if (aiComment instanceof Error) {
         return new GitLabError({
             name: "FAILED_TO_POST_COMMENT",
             message: "Failed to post AI comment",
