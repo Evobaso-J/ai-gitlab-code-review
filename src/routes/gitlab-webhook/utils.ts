@@ -18,11 +18,16 @@ export const fetchCommitDiff: GitLabFetchFunction<FetchCommitParams, FetchCommit
     headers,
     commitSha,
 }) => {
-    const commitUrl = new URL(`repository/commits/${commitSha}/diff`, gitLabBaseUrl);
+    const commitUrl = new URL(`${gitLabBaseUrl}/repository/commits/${commitSha}/diff`);
+    let changes: CommitDiffSchema[] | Error;
 
-    const changes = (await (
-        await fetch(commitUrl, { headers })
-    ).json()) as CommitDiffSchema[];
+    try {
+        changes = (await (
+            await fetch(commitUrl, { headers })
+        ).json()) as CommitDiffSchema[];
+    } catch (error: any) {
+        changes = error;
+    }
 
     if (changes instanceof Error) {
         return new GitLabError({
@@ -46,14 +51,19 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
     targetBranch,
     sourceBranch
 }) => {
-    const compareUrl = new URL(`repository/compare`, gitLabBaseUrl);
-    compareUrl.searchParams.append('from', targetBranch);
-    compareUrl.searchParams.append('to', sourceBranch);
+    const compareUrl = new URL(`${gitLabBaseUrl}/repository/compare`);
+    compareUrl.searchParams.append('from', sourceBranch);
+    compareUrl.searchParams.append('to', targetBranch);
 
-    const branchDiff = (await (
-        await fetch(compareUrl, { headers })
-    ).json()) as RepositoryCompareSchema;
-
+    let branchDiff: RepositoryCompareSchema | Error;
+    try {
+        branchDiff = (await (
+            await fetch(compareUrl, { headers })
+        ).json());
+    } catch (error: any) {
+        console.log("I'm in the error branch", error);
+        branchDiff = error;
+    }
     if (branchDiff instanceof Error) {
         return new GitLabError({
             name: "MISSING_DIFF",
@@ -74,18 +84,23 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
     changesOldPaths,
 }) => {
     const oldFilesRequestUrls = changesOldPaths.map(path =>
-        new URL(`repository/files/${encodeURIComponent(path)}/raw`, gitLabBaseUrl)
+        new URL(`${gitLabBaseUrl}/repository/files/${encodeURIComponent(path)}/raw`)
     );
 
-    const oldFiles = await Promise.all(
-        oldFilesRequestUrls.map(async (url) => {
-            const file = await (
-                await fetch(url, { headers })
-            ).text();
+    let oldFiles: string[] | Error;
+    try {
+        oldFiles = await Promise.all(
+            oldFilesRequestUrls.map(async (url) => {
+                const file = await (
+                    await fetch(url, { headers })
+                ).text();
 
-            return file;
-        })
-    );
+                return file;
+            })
+        );
+    } catch (error: any) {
+        oldFiles = error;
+    }
 
     if (oldFiles instanceof Error) {
         return new GitLabError({
@@ -98,14 +113,20 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
 }
 
 export async function generateAICompletion(messages: ChatCompletionMessageParam[], openaiInstance: OpenAI, aiModel: ChatModel): Promise<ChatCompletion | OpenAIError> {
-    const completion = await openaiInstance.chat.completions.create(
-        {
-            model: aiModel,
-            temperature: 0.7,
-            stream: false,
-            messages
-        }
-    )
+    let completion: ChatCompletion | Error;
+
+    try {
+        completion = await openaiInstance.chat.completions.create(
+            {
+                model: aiModel,
+                temperature: 0.7,
+                stream: false,
+                messages
+            }
+        )
+    } catch (error: any) {
+        completion = error;
+    }
 
     if (completion instanceof Error) {
         return new OpenAIError({
@@ -126,13 +147,18 @@ export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAIComme
     headers,
     mergeRequestIid,
 }, commentPayload: CommentPayload): Promise<void | GitLabError> => {
-    const commentUrl = new URL(`merge_requests/${mergeRequestIid}/notes`, gitLabBaseUrl);
+    const commentUrl = new URL(`${gitLabBaseUrl}/merge_requests/${mergeRequestIid}/notes`);
 
-    const aiComment = fetch(commentUrl, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(commentPayload),
-    });
+    let aiComment: Response | Error;
+    try {
+        aiComment = await fetch(commentUrl, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(commentPayload),
+        });
+    } catch (error: any) {
+        aiComment = error;
+    }
 
     if (aiComment instanceof Error) {
         return new GitLabError({
