@@ -52,8 +52,8 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
     sourceBranch
 }) => {
     const compareUrl = new URL(`${gitLabBaseUrl}/repository/compare`);
-    compareUrl.searchParams.append('from', sourceBranch);
-    compareUrl.searchParams.append('to', targetBranch);
+    compareUrl.searchParams.append('from', targetBranch);
+    compareUrl.searchParams.append('to', sourceBranch);
 
     let branchDiff: RepositoryCompareSchema | Error;
     try {
