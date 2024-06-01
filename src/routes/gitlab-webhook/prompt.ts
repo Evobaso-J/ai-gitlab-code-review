@@ -43,12 +43,11 @@ export const buildPrompt = (oldFiles: OldFileVersion[], changes: CommitDiffSchem
 }
 
 export const buildAnswer = (completion: ChatCompletion | Error | undefined): string => {
-    let answer: string = '';
-    if (!completion) {
-        answer = ERROR_ANSWER;
-    }
     if (completion instanceof Error) {
-        answer = `${ERROR_ANSWER}\n\nError: ${completion.message}`;
+        return `${ERROR_ANSWER}\n\nError: ${completion.message}`;
     }
-    return `${answer}\n\n${DISCLAIMER}`;
+    if (!completion || !completion.choices.length) {
+        return `${ERROR_ANSWER}\n\n${DISCLAIMER}`;
+    }
+    return `${completion.choices[0]!.message.content}\n\n${DISCLAIMER}`;
 }
