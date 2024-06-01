@@ -54,6 +54,7 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
     const compareUrl = new URL(`${gitLabBaseUrl}/repository/compare`);
     compareUrl.searchParams.append('from', targetBranch);
     compareUrl.searchParams.append('to', sourceBranch);
+    compareUrl.searchParams.append('unidiff', String(true));
 
     let branchDiff: RepositoryCompareSchema | Error;
     try {
@@ -61,7 +62,6 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
             await fetch(compareUrl, { headers })
         ).json());
     } catch (error: any) {
-        console.log("I'm in the error branch", error);
         branchDiff = error;
     }
     if (branchDiff instanceof Error) {
@@ -77,7 +77,8 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
 type FetchPreEditFilesParams = {
     changesOldPaths: string[],
 }
-type FetchPreEditFilesResult = string[] | GitLabError;
+export type OldFileVersion = { fileName: string, fileContent: string };
+type FetchPreEditFilesResult = OldFileVersion[] | GitLabError;
 export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, FetchPreEditFilesResult> = async ({
     gitLabBaseUrl,
     headers,
@@ -86,15 +87,14 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
     const oldFilesRequestUrls = changesOldPaths.map(path =>
         new URL(`${gitLabBaseUrl}/repository/files/${encodeURIComponent(path)}/raw`)
     );
-
-    let oldFiles: string[] | Error;
+    // IF THE FILE HAS BEEN CREATED ANEW, THE OLD FILE WILL NOT EXIST
+    let oldFiles: PromiseSettledResult<string>[] | Error;
     try {
-        oldFiles = await Promise.all(
+        oldFiles = await Promise.allSettled(
             oldFilesRequestUrls.map(async (url) => {
                 const file = await (
                     await fetch(url, { headers })
                 ).text();
-
                 return file;
             })
         );
@@ -109,7 +109,15 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
         });
     }
 
-    return oldFiles;
+    return oldFiles.reduce<OldFileVersion[]>((acc, file, index) => {
+        if (file.status === "fulfilled") {
+            acc.push({
+                fileName: changesOldPaths[index]!,
+                fileContent: file.value,
+            });
+        }
+        return acc;
+    }, []);
 }
 
 export async function generateAICompletion(messages: ChatCompletionMessageParam[], openaiInstance: OpenAI, aiModel: ChatModel): Promise<ChatCompletion | OpenAIError> {

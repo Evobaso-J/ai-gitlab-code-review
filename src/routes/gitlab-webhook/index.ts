@@ -76,7 +76,7 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
         } catch (error) {
             if (error instanceof Error) {
                 fastify.log.error(error.message, error);
-                reply.code(500).send(error);
+                reply.code(500).send({ result: error });
                 return;
             }
         }
