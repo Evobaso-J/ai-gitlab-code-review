@@ -1,12 +1,10 @@
-import { buildPrompt, buildAnswer } from "./prompt.js";
-import type { GitLabWebhookHandler } from "./types.js";
-import { fetchBranchDiff, fetchPreEditFiles, generateAICompletion, fetchCommitDiff } from "./utils.js";
+import { buildPrompt } from "./prompt.js";
+import type { CommentPayload, GitLabWebhookHandler, SupportedWebhookEvent } from "./types.js";
+import { fetchBranchDiff, fetchPreEditFiles, fetchCommitDiff } from "./utils.js";
 import type { WebhookMergeRequestEventSchema, WebhookPushEventSchema } from "@gitbeaker/rest";
 
 
 export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEventSchema> = async (mergeRequestEvent: WebhookMergeRequestEventSchema, {
-    openaiInstance,
-    AIModel,
     gitlabUrl,
     headers,
 }) => {
@@ -27,8 +25,7 @@ export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEve
         sourceBranch,
         targetBranch,
         headers
-    }
-    );
+    });
     if (changes instanceof Error) return changes;
 
     const changesOldPaths = changes.diffs?.map(diff => diff.old_path) ?? []
@@ -41,25 +38,17 @@ export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEve
     });
     if (oldFiles instanceof Error) return oldFiles;
 
-    const messages = buildPrompt(oldFiles, changes.diffs ?? []);
-
-    const completion = await generateAICompletion(messages, openaiInstance, AIModel);
-    if (completion instanceof Error) return completion;
-
-
-    const answer = buildAnswer(completion);
+    const messageParams = buildPrompt(oldFiles, changes.diffs ?? []);
 
     return {
         mergeRequestIid,
         gitLabBaseUrl,
-        commentPayload: { body: answer },
+        messageParams,
     }
 }
 
 
 export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = async (pushEvent: WebhookPushEventSchema, {
-    openaiInstance,
-    AIModel,
     gitlabUrl,
     headers,
 }) => {
@@ -87,17 +76,19 @@ export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = asyn
     });
     if (oldFiles instanceof Error) return oldFiles;
 
-    const messages = buildPrompt(oldFiles, changes);
-
-    const completion = await generateAICompletion(messages, openaiInstance, AIModel);
-    if (completion instanceof Error) return completion;
-
-
-    const answer = buildAnswer(completion);
+    const messageParams = buildPrompt(oldFiles, changes);
 
     return {
         mergeRequestIid: commitSha,
         gitLabBaseUrl,
-        commentPayload: { note: answer },
+        messageParams,
     }
+}
+
+export const buildCommentPayload = <T extends SupportedWebhookEvent>(answer: string, eventType: T['object_kind']): CommentPayload => {
+    if (eventType === "merge_request") {
+        return { body: answer } as CommentPayload
+    }
+    return { note: answer }
+
 }

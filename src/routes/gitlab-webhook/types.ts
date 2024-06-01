@@ -1,34 +1,27 @@
 import type { WebhookPushEventSchema, WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
-import type { ChatModel } from "openai/resources/index.mjs";
-import OpenAI from "openai";
 import { BaseError } from "../../config/errors.js";
+import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
 export type FetchHeaders = {
     'private-token': string;
 }
-export type CommentPayload = { "body": string } | { note: string } | undefined;
 
+export type CommentPayload = { body: string } | { note: string };
 
 
 // #region Webhook Handler
 export type SupportedWebhookEvent = WebhookPushEventSchema | WebhookMergeRequestEventSchema;
-export type WebhookHandlerResult<T extends SupportedWebhookEvent> = {
+export type WebhookHandlerResult = {
     mergeRequestIid: string;
-    commentPayload: ExtractPayloadTypeFromEvent<T>;
+    messageParams: ChatCompletionMessageParam[];
     gitLabBaseUrl: URL;
 }
 
-type ExtractPayloadTypeFromEvent<T extends SupportedWebhookEvent> =
-    T extends WebhookPushEventSchema ? { note: string }
-    : T extends WebhookMergeRequestEventSchema ? { body: string }
-    : never;
 
 export type GitLabWebhookHandler<TWebhookEvent extends SupportedWebhookEvent = SupportedWebhookEvent> = (event: TWebhookEvent, envVariables: {
-    openaiInstance: OpenAI,
-    AIModel: ChatModel,
     gitlabUrl: URL,
     headers: FetchHeaders
-}) => Promise<WebhookHandlerResult<TWebhookEvent> | Error>;
+}) => Promise<WebhookHandlerResult | Error>;
 // #endregion
 
 

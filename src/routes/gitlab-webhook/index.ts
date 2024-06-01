@@ -1,8 +1,9 @@
 import type { FastifyPluginAsync, RequestParamsDefault, RequestQuerystringDefault } from "fastify";
 import { OpenAI } from "openai";
-import { postAIComment } from "./utils.js";
+import { generateAICompletion, postAIComment } from "./utils.js";
 import { GitLabError, type FetchHeaders, type GitLabWebhookHandler, type SupportedWebhookEvent } from "./types.js";
-import { handlePushHook, handleMergeRequestHook } from "./hookHandlers.js";
+import { handlePushHook, handleMergeRequestHook, buildCommentPayload } from "./hookHandlers.js";
+import { buildAnswer } from "./prompt.js";
 
 
 type GitLabWebhookRequest = {
@@ -32,6 +33,12 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
 
         const headers: FetchHeaders = { 'private-token': fastify.env.GITLAB_TOKEN };
 
+        let result: Awaited<ReturnType<GitLabWebhookHandler>> = new GitLabError({
+            name: "UNSUPPORTED_EVENT_TYPE",
+            message: `Webhook events of type "${body.object_kind}" are not supported`,
+        });
+
+        // FETCH NEEDED PARAMS FOR AI COMPLETION
         try {
             /**
              * Each handler has to return a prompt. 
@@ -41,31 +48,42 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
              * 2. The files before the edit
              */
 
-            let result: Awaited<ReturnType<GitLabWebhookHandler>> = new GitLabError({
-                name: "UNSUPPORTED_EVENT_TYPE",
-                message: `Webhook events of type "${body.object_kind}" are not supported`,
-            });
             if (body.object_kind === 'push') {
                 result = await handlePushHook(body, {
-                    AIModel,
                     gitlabUrl,
                     headers,
-                    openaiInstance,
                 })
             }
             if (body.object_kind === 'merge_request') {
                 result = await handleMergeRequestHook(body, {
-                    AIModel,
                     gitlabUrl,
                     headers,
-                    openaiInstance,
                 })
             }
 
-            if (result instanceof Error) throw result;
-            const { commentPayload, gitLabBaseUrl, mergeRequestIid } = result;
+        } catch (error) {
+            if (error instanceof Error) {
+                fastify.log.error(error.message, error);
+                reply.code(500).send({ result: error });
+                return;
+            }
+        }
+        if (result instanceof Error) throw result;
 
-            // Post the comment
+        // We return a 200 OK to GitLab to avoid 
+        // the webhook to timeout due to the AI completion
+        // taking too long
+        reply.code(200).send({ status: "OK" });
+
+        try {
+            // CREATE AI COMMENT
+            const { messageParams, gitLabBaseUrl, mergeRequestIid } = result;
+            const completion = await generateAICompletion(messageParams, openaiInstance, AIModel);
+
+            const answer = buildAnswer(completion);
+            const commentPayload = buildCommentPayload(answer, body.object_kind);
+
+            // POST COMMENT ON MERGE REQUEST
             const aiComment = postAIComment({
                 gitLabBaseUrl,
                 mergeRequestIid,
@@ -76,12 +94,9 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
         } catch (error) {
             if (error instanceof Error) {
                 fastify.log.error(error.message, error);
-                reply.code(500).send({ result: error });
                 return;
             }
         }
-
-        reply.code(200).send({ status: "OK" });
     })
 }
 
