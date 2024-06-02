@@ -2,11 +2,11 @@ import OpenAI from "openai";
 import type { CommitDiffSchema, RepositoryCompareSchema } from "@gitbeaker/rest";
 import type { ChatCompletion, ChatModel } from "openai/resources/index.mjs";
 import type { ChatCompletionMessageParam } from "openai/resources/index.js";
-import { type FetchHeaders, type CommentPayload, OpenAIError, GitLabError } from "./types.js";
+import { type GitLabFetchHeaders, type CommentPayload, OpenAIError, GitLabError } from "./types.js";
 
 type GitLabFetchFunction<URLParams extends Record<string, any> = {}, Result = GitLabError> = (fetchParams: {
     gitLabBaseUrl: URL,
-    headers: FetchHeaders,
+    headers: GitLabFetchHeaders,
 } & URLParams, ...rest: any[]) => Promise<Result>
 
 type FetchCommitParams = {

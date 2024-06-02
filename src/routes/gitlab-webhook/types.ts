@@ -2,7 +2,7 @@ import type { WebhookPushEventSchema, WebhookMergeRequestEventSchema } from "@gi
 import { BaseError } from "../../config/errors.js";
 import type { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 
-export type FetchHeaders = {
+export type GitLabFetchHeaders = {
     'private-token': string;
 }
 
@@ -20,8 +20,10 @@ export type WebhookHandlerResult = {
 
 export type GitLabWebhookHandler<TWebhookEvent extends SupportedWebhookEvent = SupportedWebhookEvent> = (event: TWebhookEvent, envVariables: {
     gitlabUrl: URL,
-    headers: FetchHeaders
+    headers: GitLabFetchHeaders
 }) => Promise<WebhookHandlerResult | Error>;
+
+export type GitLabWebhookHandlerReturnType = Awaited<ReturnType<GitLabWebhookHandler>>;
 // #endregion
 
 
