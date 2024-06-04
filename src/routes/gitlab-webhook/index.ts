@@ -97,6 +97,10 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
 
                 if (fastify.gitLabWebhookHandlerResult instanceof Error) throw fastify.gitLabWebhookHandlerResult;
 
+                if (!fastify.gitLabWebhookHandlerResult) return;
+
+                // CREATE AI COMMENT
+                const { messageParams, gitLabBaseUrl, mergeRequestIid } = fastify.gitLabWebhookHandlerResult;
 
                 try {
                     const openaiInstance = new OpenAI({
@@ -110,7 +114,6 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
                     const completion = await generateAICompletion(messageParams, openaiInstance, AIModel);
                     const answer = buildAnswer(completion);
                     const commentPayload = buildCommentPayload(answer, request.body.object_kind);
-                    console.log("AI COMMENT", commentPayload);
                     // POST COMMENT ON MERGE REQUEST
                     const aiComment = postAIComment({
                         gitLabBaseUrl,

@@ -3,6 +3,7 @@ import type { CommentPayload, GitLabWebhookHandler, SupportedWebhookEvent } from
 import { fetchBranchDiff, fetchPreEditFiles, fetchCommitDiff } from "./utils.js";
 import type { WebhookMergeRequestEventSchema, WebhookPushEventSchema } from "@gitbeaker/rest";
 
+const supportedMergeRequestActions: WebhookMergeRequestEventSchema['object_attributes']['action'][] = ["open", "reopen", "update"] as const;
 
 export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEventSchema> = async (mergeRequestEvent: WebhookMergeRequestEventSchema, {
     gitlabUrl,
@@ -13,9 +14,12 @@ export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEve
             target_project_id: targetProjectId,
             source_branch: sourceBranch,
             target_branch: targetBranch,
-            last_commit: { id: mergeRequestIid },
+            iid: mergeRequestIid,
+            action,
         },
     } = mergeRequestEvent;
+
+    if (!supportedMergeRequestActions.includes(action)) return
 
     const gitLabBaseUrl = new URL(`${gitlabUrl}/projects/${targetProjectId}`);
 

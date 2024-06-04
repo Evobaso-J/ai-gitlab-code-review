@@ -21,7 +21,7 @@ export type WebhookHandlerResult = {
 export type GitLabWebhookHandler<TWebhookEvent extends SupportedWebhookEvent = SupportedWebhookEvent> = (event: TWebhookEvent, envVariables: {
     gitlabUrl: URL,
     headers: GitLabFetchHeaders
-}) => Promise<WebhookHandlerResult | Error>;
+}) => Promise<WebhookHandlerResult | Error | undefined>;
 
 export type GitLabWebhookHandlerReturnType = Awaited<ReturnType<GitLabWebhookHandler>>;
 // #endregion
