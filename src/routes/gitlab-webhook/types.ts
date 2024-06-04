@@ -12,7 +12,7 @@ export type CommentPayload = { body: string } | { note: string };
 // #region Webhook Handler
 export type SupportedWebhookEvent = WebhookPushEventSchema | WebhookMergeRequestEventSchema;
 export type WebhookHandlerResult = {
-    mergeRequestIid: string;
+    mergeRequestIid: string | number;
     messageParams: ChatCompletionMessageParam[];
     gitLabBaseUrl: URL;
 }

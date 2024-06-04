@@ -118,7 +118,7 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
                         headers: fastify.gitLabFetchHeaders,
                     }, commentPayload);
                     if (aiComment instanceof Error) throw aiComment;
-
+                    fastify.log.info("AI Comment posted successfully");
                 } catch (error) {
                     if (error instanceof Error) {
                         fastify.log.error(error.message, error);

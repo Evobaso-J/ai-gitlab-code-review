@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import type { CommitDiffSchema, RepositoryCompareSchema } from "@gitbeaker/rest";
 import type { ChatCompletion, ChatModel } from "openai/resources/index.mjs";
 import type { ChatCompletionMessageParam } from "openai/resources/index.js";
-import { type GitLabFetchHeaders, type CommentPayload, OpenAIError, GitLabError } from "./types.js";
+import { type GitLabFetchHeaders, OpenAIError, GitLabError, type CommentPayload } from "./types.js";
 
 type GitLabFetchFunction<URLParams extends Record<string, any> = {}, Result = GitLabError> = (fetchParams: {
     gitLabBaseUrl: URL,
@@ -147,7 +147,7 @@ export async function generateAICompletion(messages: ChatCompletionMessageParam[
 }
 
 type PostAICommentParams = {
-    mergeRequestIid: string,
+    mergeRequestIid: string | number,
 }
 type PostAICommentResult = void | GitLabError;
 export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAICommentResult> = async ({
@@ -156,18 +156,19 @@ export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAIComme
     mergeRequestIid,
 }, commentPayload: CommentPayload): Promise<void | GitLabError> => {
     const commentUrl = new URL(`${gitLabBaseUrl}/merge_requests/${mergeRequestIid}/notes`);
-
     let aiComment: Response | Error;
     try {
         aiComment = await fetch(commentUrl, {
             method: "POST",
-            headers,
+            headers: {
+                ...headers,
+                "Content-Type": "application/json",
+            },
             body: JSON.stringify(commentPayload),
         });
     } catch (error: any) {
         aiComment = error;
     }
-
     if (aiComment instanceof Error) {
         return new GitLabError({
             name: "FAILED_TO_POST_COMMENT",
