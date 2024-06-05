@@ -108,8 +108,6 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
                     });
                     const AIModel = fastify.env.AI_MODEL;
 
-                    // CREATE AI COMMENT
-                    const { messageParams, gitLabBaseUrl, mergeRequestIid } = fastify.gitLabWebhookHandlerResult;
 
                     const completion = await generateAICompletion(messageParams, openaiInstance, AIModel);
                     const answer = buildAnswer(completion);
