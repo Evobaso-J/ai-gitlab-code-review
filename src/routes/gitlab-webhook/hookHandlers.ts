@@ -1,4 +1,4 @@
-import { buildPrompt } from "./prompt.js";
+import { buildPrompt } from "../../config/prompt.js";
 import type { CommentPayload, GitLabWebhookHandler, SupportedWebhookEvent } from "./types.js";
 import { fetchBranchDiff, fetchPreEditFiles, fetchCommitDiff } from "./services.js";
 import type { WebhookMergeRequestEventSchema, WebhookPushEventSchema } from "@gitbeaker/rest";
