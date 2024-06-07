@@ -71,12 +71,13 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
                     })
                 }
 
-            } catch (error) {
-                if (error instanceof Error) {
-                    fastify.log.error(error.message, error);
-                    reply.code(500).send({ result: error });
-                    return;
-                }
+            } catch (error: any) {
+                fastify.gitLabWebhookHandlerResult = error
+            }
+            if (fastify.gitLabWebhookHandlerResult instanceof Error) {
+                fastify.log.error(fastify.gitLabWebhookHandlerResult.message, fastify.gitLabWebhookHandlerResult);
+                reply.code(500).send({ result: fastify.gitLabWebhookHandlerResult });
+                return;
             }
             // We return a 200 OK to GitLab to avoid 
             // the webhook to timeout due to the AI completion

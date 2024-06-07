@@ -20,24 +20,22 @@ export const fetchCommitDiff: GitLabFetchFunction<FetchCommitParams, FetchCommit
     commitSha,
 }) => {
     const commitUrl = new URL(`${gitLabBaseUrl}/repository/commits/${commitSha}/diff`);
-    let changes: CommitDiffSchema[] | Error;
+    let changes: Response | Error;
 
     try {
-        changes = (await (
-            await fetch(commitUrl, { headers })
-        ).json()) as CommitDiffSchema[];
+        changes = await fetch(commitUrl, { headers });
     } catch (error: any) {
         changes = error;
     }
 
-    if (changes instanceof Error) {
+    if (changes instanceof Error || !changes.ok) {
         return new GitLabError({
             name: "MISSING_DIFF",
             message: "Failed to fetch commit diff",
         });
     }
 
-    return changes;
+    return await (changes.json()) as CommitDiffSchema[];
 }
 
 type FetchBranchParams = {
@@ -57,22 +55,22 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
     compareUrl.searchParams.append('to', sourceBranch);
     compareUrl.searchParams.append('unidiff', String(true));
 
-    let branchDiff: RepositoryCompareSchema | Error;
+    let branchDiff: Response | Error;
     try {
-        branchDiff = (await (
+        branchDiff = (
             await fetch(compareUrl, { headers })
-        ).json());
+        );
     } catch (error: any) {
         branchDiff = error;
     }
-    if (branchDiff instanceof Error) {
+    if (branchDiff instanceof Error || !branchDiff.ok) {
         return new GitLabError({
             name: "MISSING_DIFF",
             message: "Failed to fetch branch diff",
         });
     }
 
-    return branchDiff;
+    return await (branchDiff.json()) as RepositoryCompareSchema;
 }
 
 type FetchPreEditFilesParams = {
@@ -88,7 +86,6 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
     const oldFilesRequestUrls = changesOldPaths.map(path =>
         new URL(`${gitLabBaseUrl}/repository/files/${encodeURIComponent(path)}/raw`)
     );
-    // IF THE FILE HAS BEEN CREATED ANEW, THE OLD FILE WILL NOT EXIST
     let oldFiles: PromiseSettledResult<string>[] | Error;
     try {
         oldFiles = await Promise.allSettled(
@@ -103,6 +100,7 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
         oldFiles = error;
     }
 
+    // We throw no error if no file is found because the file might have been created anew
     if (oldFiles instanceof Error) {
         return new GitLabError({
             name: "MISSING_OLD_FILES",
@@ -170,7 +168,7 @@ export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAIComme
     } catch (error: any) {
         aiComment = error;
     }
-    if (aiComment instanceof Error) {
+    if (aiComment instanceof Error || !aiComment.ok) {
         return new GitLabError({
             name: "FAILED_TO_POST_COMMENT",
             message: "Failed to post AI comment",
