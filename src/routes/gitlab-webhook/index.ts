@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync, RequestParamsDefault, RequestQuerystringDefault } from "fastify";
 import { OpenAI } from "openai";
-import { generateAICompletion, postAIComment } from "./utils.js";
+import { generateAICompletion, postAIComment } from "./services.js";
 import { GitLabError, type GitLabFetchHeaders, type GitLabWebhookHandlerReturnType, type SupportedWebhookEvent } from "./types.js";
 import { handlePushHook, handleMergeRequestHook, buildCommentPayload } from "./hookHandlers.js";
 import { buildAnswer } from "./prompt.js";

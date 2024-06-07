@@ -1,6 +1,6 @@
 import type { CommitDiffSchema } from "@gitbeaker/rest";
 import type { ChatCompletionMessageParam, ChatCompletion } from "openai/resources/index.mjs";
-import type { OldFileVersion } from "./utils.js";
+import type { OldFileVersion } from "./services.js";
 
 
 const QUESTIONS = `\n\nQuestions:\n

@@ -1,6 +1,6 @@
 import { buildPrompt } from "./prompt.js";
 import type { CommentPayload, GitLabWebhookHandler, SupportedWebhookEvent } from "./types.js";
-import { fetchBranchDiff, fetchPreEditFiles, fetchCommitDiff } from "./utils.js";
+import { fetchBranchDiff, fetchPreEditFiles, fetchCommitDiff } from "./services.js";
 import type { WebhookMergeRequestEventSchema, WebhookPushEventSchema } from "@gitbeaker/rest";
 
 const supportedMergeRequestActions: WebhookMergeRequestEventSchema['object_attributes']['action'][] = ["open", "reopen", "update"] as const;
