@@ -1,12 +1,10 @@
 import type { FastifyPluginAsync, RequestParamsDefault, RequestQuerystringDefault } from "fastify";
-import { OpenAI } from "openai";
-import { generateAICompletion, postAIComment } from "./services.js";
 import { GitLabError, type GitLabFetchHeaders, type GitLabWebhookHandlerReturnType, type SupportedWebhookEvent } from "./types.js";
-import { handlePushHook, handleMergeRequestHook, buildCommentPayload } from "./hookHandlers.js";
-import { buildAnswer } from "../../config/prompt.js";
+import { handlePushHook, handleMergeRequestHook, } from "./hookHandlers.js";
+import { postAIReview } from "./postAIReview.js";
 
 
-type GitLabWebhookRequest = {
+export type GitLabWebhookRequest = {
     Body?: SupportedWebhookEvent;
     Querystring?: RequestQuerystringDefault;
     Params?: RequestParamsDefault;
@@ -23,7 +21,7 @@ declare module 'fastify' {
     }
 }
 
-const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
+const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     fastify
         .decorate<GitLabWebhookHandlerReturnType>('gitLabWebhookHandlerResult',
             new GitLabError({
@@ -45,7 +43,6 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
                 reply.code(400).send({ error: 'Bad Request' });
                 return;
             }
-
 
 
             // FETCH NEEDED PARAMS FOR AI COMPLETION
@@ -84,51 +81,8 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify): Promise<void> => {
             // taking too long
             reply.code(200).send({ status: "OK" });
         })
-        // CREATE AI COMMENT AND POST IT ON MERGE REQUEST
-        .addHook<GitLabWebhookRequest>('onResponse',
-            async (request, reply) => {
-                if (request.headers['x-gitlab-token'] !== fastify.env.GITLAB_TOKEN) {
-                    reply.code(401).send({ error: 'Unauthorized' });
-                    return;
-                }
-                if (!request.body) {
-                    reply.code(400).send({ error: 'Bad Request' });
-                    return;
-                }
-
-                if (fastify.gitLabWebhookHandlerResult instanceof Error) throw fastify.gitLabWebhookHandlerResult;
-
-                if (!fastify.gitLabWebhookHandlerResult) return;
-
-                // CREATE AI COMMENT
-                const { messageParams, gitLabBaseUrl, mergeRequestIid } = fastify.gitLabWebhookHandlerResult;
-
-                try {
-                    const openaiInstance = new OpenAI({
-                        apiKey: fastify.env.OPENAI_API_KEY,
-                    });
-                    const AIModel = fastify.env.AI_MODEL;
-
-
-                    const completion = await generateAICompletion(messageParams, openaiInstance, AIModel);
-                    const answer = buildAnswer(completion);
-                    const commentPayload = buildCommentPayload(answer, request.body.object_kind);
-                    // POST COMMENT ON MERGE REQUEST
-                    const aiComment = postAIComment({
-                        gitLabBaseUrl,
-                        mergeRequestIid,
-                        headers: fastify.gitLabFetchHeaders,
-                    }, commentPayload);
-                    if (aiComment instanceof Error) throw aiComment;
-                    fastify.log.info("AI Comment posted successfully");
-                } catch (error) {
-                    if (error instanceof Error) {
-                        fastify.log.error(error.message, error);
-                        return;
-                    }
-                }
-            }
-        )
+    // CREATE AI COMMENT AND POST IT ON MERGE REQUEST
+    postAIReview(fastify, opts)
 }
 
 export default gitlabWebhook;
