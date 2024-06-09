@@ -1,6 +1,6 @@
 import { type FastifyPluginAsync } from "fastify";
 import OpenAI from "openai";
-import { buildAnswer } from "../../config/prompt.js";
+import { buildAnswer } from "../../prompt/index.js";
 import { buildCommentPayload } from "./hookHandlers.js";
 import { generateAICompletion, postAIComment } from "./services.js";
 import type { GitLabWebhookRequest } from "./index.js";

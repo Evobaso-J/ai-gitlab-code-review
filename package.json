@@ -28,7 +28,8 @@
     "fastify-cli": "^6.1.1",
     "fastify-plugin": "^4.0.0",
     "fluent-json-schema": "^4.2.1",
-    "openai": "^4.47.2"
+    "openai": "^4.47.2",
+    "promptfoo": "^0.62.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",

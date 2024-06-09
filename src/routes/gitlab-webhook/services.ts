@@ -3,7 +3,7 @@ import type { CommitDiffSchema, RepositoryCompareSchema } from "@gitbeaker/rest"
 import type { ChatCompletion, ChatModel } from "openai/resources/index.mjs";
 import type { ChatCompletionMessageParam } from "openai/resources/index.js";
 import { type GitLabFetchHeaders, OpenAIError, GitLabError, type CommentPayload } from "./types.js";
-import { AI_MODEL_TEMPERATURE } from "../../config/prompt.js";
+import { AI_MODEL_TEMPERATURE } from "../../prompt/index.js";
 
 type GitLabFetchFunction<URLParams extends Record<string, any> = {}, Result = GitLabError> = (fetchParams: {
     gitLabBaseUrl: URL,
