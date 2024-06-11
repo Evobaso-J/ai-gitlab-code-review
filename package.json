@@ -14,7 +14,10 @@
     "build:ts": "tsc",
     "watch:ts": "tsc -w",
     "dev": "pnpm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm:watch:ts\" \"pnpm:dev:start\"",
-    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js"
+    "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
+    "promptfoo": "npx promptfoo@latest",
+    "test:prompt": "node --env-file=.env --loader ts-node/esm src/prompt/test/test.ts",
+    "view:promptTestResults": "npx promptfoo@latest view -y"
   },
   "keywords": [],
   "author": "",
