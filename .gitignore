@@ -68,4 +68,4 @@ dist
 .env
 
 # prompt tests results
-src/prompt/test/prompt-test-dataset.json
+src/prompt/promptfoo/prompt-test-dataset.json
