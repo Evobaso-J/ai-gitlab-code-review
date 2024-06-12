@@ -1,9 +1,9 @@
 import promptfoo from 'promptfoo'
-import { promptTestCases } from './cases.js'
+import { promptTestSuite } from './test-suite.js'
 import { writeFileSync } from 'node:fs';
 
 (async () => {
-    const results = await promptfoo.evaluate(promptTestCases)
+    const results = await promptfoo.evaluate(promptTestSuite)
     console.log('RESULTS:');
     const resultsString = JSON.stringify(results, null, 2);
     console.log(resultsString);

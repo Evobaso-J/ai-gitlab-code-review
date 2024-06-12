@@ -42,7 +42,7 @@ export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEve
     });
     if (oldFiles instanceof Error) return oldFiles;
 
-    const messageParams = buildPrompt(oldFiles, changes.diffs ?? []);
+    const messageParams = buildPrompt({ oldFiles, changes: changes.diffs ?? [] });
 
     return {
         mergeRequestIid,
@@ -80,7 +80,7 @@ export const handlePushHook: GitLabWebhookHandler<WebhookPushEventSchema> = asyn
     });
     if (oldFiles instanceof Error) return oldFiles;
 
-    const messageParams = buildPrompt(oldFiles, changes);
+    const messageParams = buildPrompt({ oldFiles, changes });
 
     return {
         mergeRequestIid: commitSha,
