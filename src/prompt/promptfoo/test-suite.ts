@@ -8,10 +8,10 @@ const prompts: EvaluateTestSuite['prompts'] = [
 
 const providers: EvaluateTestSuite['providers'] = [
     {
-        id: "openai:gpt-3.5-turbo-0613",
+        id: "openai:gpt-4",
     },
     {
-        id: "openai:gpt-4",
+        id: "openai:gpt-4o",
     },
 ]
 

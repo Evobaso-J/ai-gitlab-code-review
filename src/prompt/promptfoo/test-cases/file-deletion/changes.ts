@@ -1,10 +1,10 @@
 import type { BuildPromptParameters } from "../../../index.js";
 
 const diff = `
-diff --git a/file-deletion/search.txt b/file-deletion/search.txt
+diff --git a/file-deletion/search.ts b/file-deletion/search.ts
 deleted file mode 100644
 index 0ed552c..0000000
---- a/file-deletion/search.txt
+--- a/file-deletion/search.ts
 +++ /dev/null
 @@ -1,14 +0,0 @@
 -// Binary search algorithm

@@ -6,6 +6,8 @@ import newFileOldFiles from "./new-file/oldFiles.js";
 import { newFileChanges } from "./new-file/changes.js";
 import fileDeletionOldFiles from "./file-deletion/oldFiles.js";
 import { fileDeletionChanges } from "./file-deletion/changes.js";
+import subtleErrorsOldFiles from "./subtle-errors/oldFiles.js";
+import { subtleErrorsChanges } from "./subtle-errors/changes.js";
 
 
 const commonAsserts: (AssertionSet | Assertion)[] = [
@@ -68,6 +70,16 @@ export const promptfooTests: TestCase<
             vars: {
                 oldFiles: fileDeletionOldFiles,
                 changes: fileDeletionChanges,
+            },
+            assert: [
+                ...commonAsserts,
+            ],
+        },
+        {
+            description: `subtle errors`,
+            vars: {
+                oldFiles: subtleErrorsOldFiles,
+                changes: subtleErrorsChanges,
             },
             assert: [
                 ...commonAsserts,

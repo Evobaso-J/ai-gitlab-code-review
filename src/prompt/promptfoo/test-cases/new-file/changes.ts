@@ -1,11 +1,11 @@
 import type { BuildPromptParameters } from "../../../index.js";
 
 const diff = `
-diff --git a/search.txt b/search.txt
+diff --git a/search.ts b/search.ts
 new file mode 100644
 index 0000000..0ed552c
 --- /dev/null
-+++ b/search.txt
++++ b/search.ts
 @@ -0,0 +1,14 @@
 +// Binary search algorithm
 +export function search(nums: number[], target: number): number {

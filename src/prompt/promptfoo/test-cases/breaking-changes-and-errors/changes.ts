@@ -1,10 +1,10 @@
 import type { BuildPromptParameters } from "../../../index.js";
 
 const diff = `
-diff --git a/search.txt b/search.txt
+diff --git a/search.ts b/search.ts
 index 0ed552c..83b21ef 100644
---- a/search.txt
-+++ b/searchEdited.txt
+--- a/search.ts
++++ b/searchEdited.ts
 @@ -4,8 +4,7 @@ export function search(nums: number[], target: number): number {
      while (r >= l) {
          let i = l + Math.floor((r - l) / 2)
