@@ -1,0 +1,12 @@
+diff --git a/dependency-deletion/dataset.ts b/dependency-deletion/datasetEdited.ts
+index 7337bd8..8a117cb 100644
+--- a/dependency-deletion/dataset.ts
++++ b/dependency-deletion/datasetEdited.ts
+@@ -1,5 +1,5 @@
+ import { search } from "./search.js"
+ 
+-const dataset = new Array(100).fill(0).map((_, i) => i).sort(() => Math.random() - 0.5)
++const dataset = new Array(1000).fill(0).map((_, i) => i).sort(() => Math.random() - 0.5)
+ 
+ export const whereIs13 = search(dataset, 13)
+ 

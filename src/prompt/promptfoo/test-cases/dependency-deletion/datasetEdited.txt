@@ -1,0 +1,6 @@
+import { search } from "./search.js"
+
+const dataset = new Array(1000).fill(0).map((_, i) => i).sort(() => Math.random() - 0.5)
+
+export const whereIs13 = search(dataset, 13)
+

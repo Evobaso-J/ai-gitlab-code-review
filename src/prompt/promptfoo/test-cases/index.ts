@@ -8,6 +8,8 @@ import fileDeletionOldFiles from "./file-deletion/oldFiles.js";
 import { fileDeletionChanges } from "./file-deletion/changes.js";
 import subtleErrorsOldFiles from "./subtle-errors/oldFiles.js";
 import { subtleErrorsChanges } from "./subtle-errors/changes.js";
+import { dependencyDeletionChanges } from "./dependency-deletion/changes.js";
+import dependencyDeletionOldFiles from "./dependency-deletion/oldFiles.js";
 
 
 const commonAsserts: (AssertionSet | Assertion)[] = [
@@ -53,6 +55,10 @@ export const promptfooTests: TestCase<
             },
             assert: [
                 ...commonAsserts,
+                {
+                    type: "model-graded-closedqa",
+                    value: "ensure that the output catches the presence of a bug"
+                }
             ],
         },
         {
@@ -63,6 +69,10 @@ export const promptfooTests: TestCase<
             },
             assert: [
                 ...commonAsserts,
+                {
+                    type: "model-graded-closedqa",
+                    value: "ensure that the output recognizes the addition of a new file and reviews its contents"
+                }
             ],
         },
         {
@@ -73,6 +83,24 @@ export const promptfooTests: TestCase<
             },
             assert: [
                 ...commonAsserts,
+                {
+                    type: "model-graded-closedqa",
+                    value: "ensure that the output recognizes the deletion of file and understands the implications of the deletion"
+                }
+            ],
+        },
+        {
+            description: `dependency deletion`,
+            vars: {
+                oldFiles: dependencyDeletionOldFiles,
+                changes: dependencyDeletionChanges,
+            },
+            assert: [
+                ...commonAsserts,
+                {
+                    type: "model-graded-closedqa",
+                    value: "ensure that the output recognizes the presence of a bug due to the deletion of an imported file"
+                }
             ],
         },
         {
@@ -83,6 +111,10 @@ export const promptfooTests: TestCase<
             },
             assert: [
                 ...commonAsserts,
+                {
+                    type: "model-graded-closedqa",
+                    value: "ensure that the output catches the presence of a bug"
+                }
             ],
         },
     ]
