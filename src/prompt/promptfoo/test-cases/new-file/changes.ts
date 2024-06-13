@@ -23,10 +23,10 @@ index 0000000..0ed552c
 +};
 `
 
-const newFileChanges: BuildPromptParameters['changes'] = [
+const changes: BuildPromptParameters['changes'] = [
     {
         diff
     }
 ]
 
-export { newFileChanges } 
+export default changes 

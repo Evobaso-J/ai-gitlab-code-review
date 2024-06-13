@@ -27,7 +27,7 @@ const dataset = new Array(100).fill(0).map((_, i) => i).sort(() => Math.random()
 export const whereIs13 = search(dataset, 13)
 `
 
-const dependencyDeletionOldFiles: BuildPromptParameters['oldFiles'] = [
+const oldFiles: BuildPromptParameters['oldFiles'] = [
     {
         fileName: "search.ts",
         fileContent
@@ -38,4 +38,4 @@ const dependencyDeletionOldFiles: BuildPromptParameters['oldFiles'] = [
     }
 ]
 
-export default dependencyDeletionOldFiles
+export default oldFiles

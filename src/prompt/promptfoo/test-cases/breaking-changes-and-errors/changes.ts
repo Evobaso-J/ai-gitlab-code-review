@@ -17,10 +17,10 @@ index 0ed552c..83b21ef 100644
          }
 `
 
-const breakingChangesAndErrorsChanges: BuildPromptParameters['changes'] = [
+const changes: BuildPromptParameters['changes'] = [
     {
         diff
     }
 ]
 
-export { breakingChangesAndErrorsChanges } 
+export default changes

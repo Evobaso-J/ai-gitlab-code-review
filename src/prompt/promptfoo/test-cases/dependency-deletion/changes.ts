@@ -38,7 +38,7 @@ index 7337bd8..8a117cb 100644
  export const whereIs13 = search(dataset, 13)
 `
 
-const dependencyDeletionChanges: BuildPromptParameters['changes'] = [
+const changes: BuildPromptParameters['changes'] = [
     {
         diff
     },
@@ -47,4 +47,4 @@ const dependencyDeletionChanges: BuildPromptParameters['changes'] = [
     }
 ]
 
-export { dependencyDeletionChanges } 
+export default changes 

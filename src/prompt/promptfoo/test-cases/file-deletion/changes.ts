@@ -24,10 +24,10 @@ index 0ed552c..0000000
 
 `
 
-const fileDeletionChanges: BuildPromptParameters['changes'] = [
+const changes: BuildPromptParameters['changes'] = [
     {
         diff
     }
 ]
 
-export { fileDeletionChanges } 
+export default changes 

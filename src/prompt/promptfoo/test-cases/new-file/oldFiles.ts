@@ -1,10 +1,10 @@
 import type { BuildPromptParameters } from "../../../index.js"
 
-const newFileOldFiles: BuildPromptParameters['oldFiles'] = [
+const oldFiles: BuildPromptParameters['oldFiles'] = [
     {
         fileName: "search.ts",
         fileContent: ""
     }
 ]
 
-export default newFileOldFiles
+export default oldFiles

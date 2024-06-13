@@ -20,11 +20,11 @@ export function search(nums: number[], target: number): number {
 `
 
 
-const breakingChangesAndErrorsOldFiles: BuildPromptParameters['oldFiles'] = [
+const oldFiles: BuildPromptParameters['oldFiles'] = [
     {
         fileName: "search.ts",
         fileContent
     }
 ]
 
-export default breakingChangesAndErrorsOldFiles
+export default oldFiles

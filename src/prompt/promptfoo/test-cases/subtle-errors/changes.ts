@@ -17,10 +17,10 @@ index 0ed552c..1a1446e 100644
 
 `
 
-const subtleErrorsChanges: BuildPromptParameters['changes'] = [
+const changes: BuildPromptParameters['changes'] = [
     {
         diff
     }
 ]
 
-export { subtleErrorsChanges } 
+export default changes  
