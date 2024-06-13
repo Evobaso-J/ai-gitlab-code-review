@@ -1,5 +1,5 @@
 import type { TestCase } from "promptfoo";
-import { commonAsserts } from "../index.js";
+import { commonAsserts } from "../utils.js";
 import changes from "./changes.js";
 import oldFiles from "./oldFiles.js";
 import type { BuildPromptParameters } from "../../../index.js";

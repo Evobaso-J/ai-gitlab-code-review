@@ -1,11 +1,4 @@
-import type { Assertion, AssertionSet, TestCase } from "promptfoo";
-import type { BuildPromptParameters } from "../../index.js";
-import { breakingChangesAndErrorsTestCase } from "./breaking-changes-and-errors/index.js";
-import { dependencyDeletionTestCase } from "./dependency-deletion/index.js";
-import { fileDeletionTestCase } from "./file-deletion/index.js";
-import { newFileTestCase } from "./new-file/index.js";
-import { subtleErrorsTestCase } from "./subtle-errors/index.js";
-
+import type { AssertionSet, Assertion } from "promptfoo";
 
 export const commonAsserts: (AssertionSet | Assertion)[] = [
     {
@@ -38,13 +31,3 @@ export const commonAsserts: (AssertionSet | Assertion)[] = [
     },
 
 ]
-
-export const promptfooTests: TestCase<
-    BuildPromptParameters
->[] = [
-        breakingChangesAndErrorsTestCase,
-        dependencyDeletionTestCase,
-        fileDeletionTestCase,
-        newFileTestCase,
-        subtleErrorsTestCase,
-    ]
