@@ -1,9 +1,11 @@
 import type { BuildPromptParameters } from "../../../index.js";
 
 const diff = `
---- search.ts	2024-06-12 23:52:44
-+++ search.ts	2024-06-12 23:53:17
-@@ -4,8 +4,7 @@
+diff --git a/search.txt b/search.txt
+index 0ed552c..83b21ef 100644
+--- a/search.txt
++++ b/searchEdited.txt
+@@ -4,8 +4,7 @@ export function search(nums: number[], target: number): number {
      while (r >= l) {
          let i = l + Math.floor((r - l) / 2)
          if (target === nums[i]) return i
@@ -13,7 +15,6 @@ const diff = `
          } else {
              r = i - 1
          }
-\ No newline at end of file
 `
 
 const breakingChangesAndErrorsChanges: BuildPromptParameters['changes'] = [

@@ -2,6 +2,10 @@ import type { Assertion, AssertionSet, TestCase } from "promptfoo";
 import { breakingChangesAndErrorsChanges } from "./breaking-changes-and-errors/changes.js";
 import breakingChangesAndErrorsOldFiles from "./breaking-changes-and-errors/oldFiles.js";
 import type { BuildPromptParameters } from "../../index.js";
+import newFileOldFiles from "./new-file/oldFiles.js";
+import { newFileChanges } from "./new-file/changes.js";
+import fileDeletionOldFiles from "./file-deletion/oldFiles.js";
+import { fileDeletionChanges } from "./file-deletion/changes.js";
 
 
 const commonAsserts: (AssertionSet | Assertion)[] = [
@@ -49,5 +53,24 @@ export const promptfooTests: TestCase<
                 ...commonAsserts,
             ],
         },
-        // { description: "When the old" }
+        {
+            description: `new file`,
+            vars: {
+                oldFiles: newFileOldFiles,
+                changes: newFileChanges,
+            },
+            assert: [
+                ...commonAsserts,
+            ],
+        },
+        {
+            description: `file deletion`,
+            vars: {
+                oldFiles: fileDeletionOldFiles,
+                changes: fileDeletionChanges,
+            },
+            assert: [
+                ...commonAsserts,
+            ],
+        },
     ]
