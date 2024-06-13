@@ -21,8 +21,6 @@ index 0000000..0ed552c
 +    }
 +    return -1
 +};
-\ No newline at end of file
-
 `
 
 const newFileChanges: BuildPromptParameters['changes'] = [

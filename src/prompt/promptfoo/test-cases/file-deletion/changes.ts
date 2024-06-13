@@ -21,7 +21,7 @@ index 0ed552c..0000000
 -    }
 -    return -1
 -};
-\ No newline at end of file
+
 `
 
 const fileDeletionChanges: BuildPromptParameters['changes'] = [
