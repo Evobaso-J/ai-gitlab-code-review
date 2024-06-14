@@ -1,4 +1,4 @@
-import type { CommitDiffSchema } from "@gitbeaker/rest";
+import type { CommitDiffSchema, ProjectFileUploadSchema } from "@gitbeaker/rest";
 import type { ChatCompletionMessageParam, ChatCompletion } from "openai/resources/index.mjs";
 import type { OldFileVersion } from "../routes/gitlab-webhook/services.js";
 
@@ -59,25 +59,15 @@ const COMMENT_DISCLAIMER =
 
 
 type AnswerImagesPaths = {
-    introImage?: string,
-    errorImage?: string
+    introImage?: ProjectFileUploadSchema,
+    errorImage?: ProjectFileUploadSchema
 }
 export const buildAnswer = (completion: ChatCompletion | Error | undefined, answerImages?: AnswerImagesPaths): string => {
     if (completion instanceof Error) {
-        return `
-        ![](${answerImages?.errorImage ?? ''})\n\n
-        ${ERROR_ANSWER}\n\n
-        Error: ${completion.message}\n\n
-        ${COMMENT_DISCLAIMER}`;
+        return `${answerImages?.errorImage?.markdown ?? ''}${ERROR_ANSWER}\n\nError: ${completion.message}\n\n${COMMENT_DISCLAIMER}`;
     }
     if (!completion || !completion.choices.length) {
-        return `
-        ![](${answerImages?.errorImage ?? ''})\n\n
-        ${ERROR_ANSWER}\n\n
-        ${COMMENT_DISCLAIMER}`;
+        return `${answerImages?.errorImage?.markdown ?? ''}${ERROR_ANSWER}\n\n${COMMENT_DISCLAIMER}`;
     }
-    return `
-    ${INTRO_FLAVOR_TEXT}\n\n
-    ![](${answerImages?.introImage ?? ''})\n\n
-    ${completion.choices[0]!.message.content}\n\n${COMMENT_DISCLAIMER}`;
+    return `${INTRO_FLAVOR_TEXT}\n\n${answerImages?.introImage?.markdown ?? ''}${completion.choices[0]!.message.content}\n\n---\n\n${COMMENT_DISCLAIMER}`;
 }

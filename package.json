@@ -17,7 +17,8 @@
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "promptfoo": "npx promptfoo@latest",
     "test:prompt": "node --env-file=.env --loader ts-node/esm src/prompt/promptfoo/index.ts",
-    "view:promptTestResults": "npx promptfoo@latest view -y"
+    "view:promptTestResults": "npx promptfoo@latest view -y",
+    "ngrok": "docker compose up --build -d && ngrok http --domain=pug-set-jointly.ngrok-free.app http://localhost:9655 && trap 'docker compose down' SIGINT SIGTERM EXIT"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +32,7 @@
     "fastify-cli": "^6.1.1",
     "fastify-plugin": "^4.0.0",
     "fluent-json-schema": "^4.2.1",
+    "ngrok": "5.0.0-beta.2",
     "openai": "^4.47.2",
     "promptfoo": "^0.62.1"
   },

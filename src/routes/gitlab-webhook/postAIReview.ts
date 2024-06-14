@@ -27,8 +27,15 @@ export const postAIReview: FastifyPluginAsync =
                 const { messageParams, gitLabBaseUrl, mergeRequestIid } = fastify.gitLabWebhookHandlerResult;
 
                 // Check if error.png and intro.png are in the assets folder
-                const introImage = await uploadImageToGitlab('assets/intro.png', gitLabBaseUrl, fastify.gitLabFetchHeaders)
-                const errorImage = await uploadImageToGitlab('assets/error.png', gitLabBaseUrl, fastify.gitLabFetchHeaders)
+                const introImage = await uploadImageToGitlab('~/assets/intro.png', gitLabBaseUrl, fastify.gitLabFetchHeaders)
+                const errorImage = await uploadImageToGitlab('~/assets/error.png', gitLabBaseUrl, fastify.gitLabFetchHeaders)
+
+                if (introImage instanceof Error) {
+                    fastify.log.error(introImage.message, introImage);
+                }
+                if (errorImage instanceof Error) {
+                    fastify.log.error(errorImage.message, errorImage);
+                }
 
                 try {
                     const openaiInstance = new OpenAI({
