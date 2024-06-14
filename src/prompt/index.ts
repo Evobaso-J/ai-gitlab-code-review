@@ -58,12 +58,26 @@ const COMMENT_DISCLAIMER =
     `This is an AI-generated response. Please review the code changes yourself before merging.`
 
 
-export const buildAnswer = (completion: ChatCompletion | Error | undefined): string => {
+type AnswerImagesPaths = {
+    introImage?: string,
+    errorImage?: string
+}
+export const buildAnswer = (completion: ChatCompletion | Error | undefined, answerImages?: AnswerImagesPaths): string => {
     if (completion instanceof Error) {
-        return `${ERROR_ANSWER}\n\nError: ${completion.message}`;
+        return `
+        ![](${answerImages?.errorImage ?? ''})\n\n
+        ${ERROR_ANSWER}\n\n
+        Error: ${completion.message}\n\n
+        ${COMMENT_DISCLAIMER}`;
     }
     if (!completion || !completion.choices.length) {
-        return `${ERROR_ANSWER}\n\n${COMMENT_DISCLAIMER}`;
+        return `
+        ![](${answerImages?.errorImage ?? ''})\n\n
+        ${ERROR_ANSWER}\n\n
+        ${COMMENT_DISCLAIMER}`;
     }
-    return `${INTRO_FLAVOR_TEXT}\n\n${completion.choices[0]!.message.content}\n\n${COMMENT_DISCLAIMER}`;
+    return `
+    ${INTRO_FLAVOR_TEXT}\n\n
+    ![](${answerImages?.introImage ?? ''})\n\n
+    ${completion.choices[0]!.message.content}\n\n${COMMENT_DISCLAIMER}`;
 }

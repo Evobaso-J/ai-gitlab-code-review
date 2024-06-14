@@ -69,3 +69,7 @@ dist
 
 # prompt tests results
 src/prompt/promptfoo/promptTestResults.json
+
+# assets
+assets/*
+!assets/readme.md

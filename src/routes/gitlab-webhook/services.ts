@@ -145,6 +145,32 @@ export async function generateAICompletion(messages: ChatCompletionMessageParam[
     return completion;
 }
 
+export const uploadImageToGitlab = async (image: string, gitLabBaseUrl: URL, headers: GitLabFetchHeaders): Promise<string | GitLabError> => {
+    const imageUploadUrl = new URL(`${gitLabBaseUrl}/uploads`);
+    let imageUpload: Response | Error;
+    try {
+        imageUpload = await fetch(imageUploadUrl, {
+            method: "POST",
+            headers: {
+                ...headers,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ file: image }),
+        });
+    } catch (error: any) {
+        imageUpload = error;
+    }
+
+    if (imageUpload instanceof Error || !imageUpload.ok) {
+        return new GitLabError({
+            name: "FAILED_IMAGE_UPLOAD",
+            message: "Failed to upload image to GitLab",
+        });
+    }
+
+    return (await imageUpload.json()).url;
+}
+
 type PostAICommentParams = {
     mergeRequestIid: string | number,
 }
@@ -153,7 +179,7 @@ export const postAIComment: GitLabFetchFunction<PostAICommentParams, PostAIComme
     gitLabBaseUrl,
     headers,
     mergeRequestIid,
-}, commentPayload: CommentPayload): Promise<void | GitLabError> => {
+}, commentPayload: CommentPayload): Promise<PostAICommentResult> => {
     const commentUrl = new URL(`${gitLabBaseUrl}/merge_requests/${mergeRequestIid}/notes`);
     let aiComment: Response | Error;
     try {

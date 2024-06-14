@@ -34,6 +34,7 @@ type GitLabErrorName =
     | "MISSING_OLD_FILES"
     | "FAILED_TO_POST_COMMENT"
     | "UNSUPPORTED_EVENT_TYPE"
+    | "FAILED_IMAGE_UPLOAD"
 
 type OpenAIErrorName =
     | "MISSING_AI_COMPLETION"
