@@ -8,6 +8,11 @@ declare module 'fastify' {
             GITLAB_URL: string
             EXPECTED_GITLAB_TOKEN: string
             AI_MODEL: ChatModel
+
+            // Customization options
+            INTRO_FLAVOR_TEXT: string | undefined
+            ERROR_ANSWER: string | undefined
+            COMMENT_DISCLAIMER: string | undefined
         };
     }
 }
