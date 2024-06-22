@@ -16,7 +16,7 @@
     "dev": "pnpm run build:ts && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm:watch:ts\" \"pnpm:dev:start\"",
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "promptfoo": "npx promptfoo@latest",
-    "test:prompt": "node --env-file=.env --loader ts-node/esm src/prompt/promptfoo/index.ts",
+    "test:prompt": "node --env-file=.env --loader ts-node/esm src/prompt/promptfoo/evalRunner.ts",
     "view:promptTestResults": "npx promptfoo@latest view -y"
   },
   "keywords": [],
