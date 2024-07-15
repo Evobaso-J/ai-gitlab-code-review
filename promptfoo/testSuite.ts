@@ -11,11 +11,8 @@ const prompts: EvaluateTestSuite['prompts'] = [
 ]
 
 const providers: EvaluateTestSuite['providers'] = [
-    // {
-    //     id: "openai:gpt-4",
-    // },
     {
-        id: "openai:gpt-4o",
+        id: `openai:${process.env.AI_MODEL}`,
     },
 ]
 
