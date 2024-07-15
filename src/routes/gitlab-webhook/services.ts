@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import type { CommitDiffSchema, RepositoryCompareSchema } from "@gitbeaker/rest";
+import type { RepositoryCompareSchema } from "@gitbeaker/rest";
 import type { ChatCompletion, ChatModel } from "openai/resources/index.mjs";
 import type { ChatCompletionMessageParam } from "openai/resources/index.js";
 import { type GitLabFetchHeaders, OpenAIError, GitLabError, type CommentPayload } from "./types.js";
@@ -10,33 +10,6 @@ type GitLabFetchFunction<URLParams extends Record<string, any> = {}, Result = Gi
     headers: GitLabFetchHeaders,
 } & URLParams, ...rest: any[]) => Promise<Result>
 
-type FetchCommitParams = {
-    commitSha: string,
-}
-type FetchCommitResult = CommitDiffSchema[] | GitLabError;
-export const fetchCommitDiff: GitLabFetchFunction<FetchCommitParams, FetchCommitResult> = async ({
-    gitLabBaseUrl,
-    headers,
-    commitSha,
-}) => {
-    const commitUrl = new URL(`${gitLabBaseUrl}/repository/commits/${commitSha}/diff`);
-    let changes: Response | Error;
-
-    try {
-        changes = await fetch(commitUrl, { headers });
-    } catch (error: any) {
-        changes = error;
-    }
-
-    if (changes instanceof Error || !changes.ok) {
-        return new GitLabError({
-            name: "MISSING_DIFF",
-            message: "Failed to fetch commit diff",
-        });
-    }
-
-    return await (changes.json()) as CommitDiffSchema[];
-}
 
 type FetchBranchParams = {
     gitLabBaseUrl: URL,
