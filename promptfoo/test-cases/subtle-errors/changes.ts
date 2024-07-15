@@ -1,4 +1,4 @@
-import type { BuildPromptParameters } from "../../../index.js";
+import type { BuildPromptParameters } from "../../../src/prompt/index.js"
 
 const diff = `
 diff --git a/subtle-errors/search.ts b/subtle-errors/searchEdited.ts

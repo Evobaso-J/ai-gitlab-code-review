@@ -2,10 +2,10 @@ import type { TestCase } from "promptfoo";
 import { commonAsserts } from "../utils.js";
 import changes from "./changes.js";
 import oldFiles from "./oldFiles.js";
-import type { BuildPromptParameters } from "../../../index.js";
+import type { BuildPromptParameters } from "../../../src/prompt/index.js";
 
-export const fileDeletionTestCase: TestCase<BuildPromptParameters> = {
-    description: `file deletion`,
+export const subtleErrorsTestCase: TestCase<BuildPromptParameters> = {
+    description: `subtle errors`,
     vars: {
         oldFiles,
         changes,
@@ -14,7 +14,7 @@ export const fileDeletionTestCase: TestCase<BuildPromptParameters> = {
         ...commonAsserts,
         {
             type: "model-graded-closedqa",
-            value: "ensure that the output recognizes the deletion of file and understands the implications of the deletion"
+            value: "ensure that the output catches the presence of a bug"
         }
     ],
 }
