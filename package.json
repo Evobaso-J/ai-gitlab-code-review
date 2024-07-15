@@ -17,7 +17,8 @@
     "dev:start": "fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
     "promptfoo": "npx promptfoo@latest",
     "test:prompt": "node --env-file=.env --loader ts-node/esm promptfoo/evalRunner.ts",
-    "view:promptfooResults": "pnpm promptfoo view -y"
+    "view:promptfooResults": "pnpm promptfoo view -y",
+    "ngrok": "scripts/ngrok.sh"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +42,7 @@
     "concurrently": "^8.2.2",
     "fastify-tsconfig": "^2.0.0",
     "husky": "^9.0.11",
+    "ngrok": "5.0.0-beta.2",
     "promptfoo": "^0.70.1",
     "ts-node": "^10.4.0",
     "typescript": "^5.2.2"
