@@ -2,7 +2,7 @@ import type { TestCase } from "promptfoo";
 import { commonAsserts } from "../utils.js";
 import changes from "./changes.js";
 import oldFiles from "./oldFiles.js";
-import type { BuildPromptParameters } from "../../../index.js";
+import type { BuildPromptParameters } from "../../../src/prompt/index.js";
 
 export const breakingChangesAndErrorsTestCase: TestCase<BuildPromptParameters> = {
     description: `breaking changes and errors`,

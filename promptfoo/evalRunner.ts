@@ -6,6 +6,6 @@ import { writeFileSync } from 'node:fs';
     const results = await promptfoo.evaluate(promptTestSuite)
     const resultsString = JSON.stringify(results, null, 2);
 
-    writeFileSync('src/prompt/promptfoo/promptTestResults.json', resultsString);
-    console.log('Wrote promptTestResults.json');
+    writeFileSync('promptfoo/promptfoo_results.json', resultsString);
+    console.log('Wrote promptfoo_results.json');
 })()
