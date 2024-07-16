@@ -56,6 +56,7 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
                  */
 
                 if (request.body.object_kind === 'merge_request') {
+                    fastify.log.info('Handling merge request webhook...');
                     fastify.gitLabWebhookHandlerResult = await handleMergeRequestHook(request.body, {
                         gitlabUrl,
                         headers: fastify.gitLabFetchHeaders,
@@ -70,6 +71,8 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
                 reply.code(500).send({ result: fastify.gitLabWebhookHandlerResult });
                 return;
             }
+
+            fastify.log.info('Webhook handled successfully, passing control to AI completion');
             // We return a 200 OK to GitLab to avoid 
             // the webhook to timeout due to the AI completion
             // taking too long

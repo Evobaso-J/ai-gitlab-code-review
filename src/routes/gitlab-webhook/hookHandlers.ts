@@ -1,11 +1,9 @@
 import { buildPrompt } from "../../prompt/index.js";
-import type { CommentPayload, GitLabWebhookHandler, SupportedWebhookEvent } from "./types.js";
+import { GitLabError, type CommentPayload, type GitLabWebhookHandler, type SupportedWebhookEvent } from "./types.js";
 import { fetchBranchDiff, fetchPreEditFiles } from "./services.js";
 import type { WebhookMergeRequestEventSchema } from "@gitbeaker/rest";
 
 const supportedMergeRequestActions: WebhookMergeRequestEventSchema['object_attributes']['action'][] = [
-    "open",
-    "reopen",
     "update"
 ] as const;
 
@@ -35,8 +33,9 @@ export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEve
         headers
     });
     if (changes instanceof Error) return changes;
+    if (!changes.diffs || !changes.diffs.length) return new GitLabError({ name: "EMPTY_DIFF", message: "No changes found in the merge request" })
 
-    const changesOldPaths = changes.diffs?.map(diff => diff.old_path) ?? []
+    const changesOldPaths = changes.diffs.map(diff => diff.old_path)
 
     // Fetch files before the edit
     const oldFiles = await fetchPreEditFiles({
