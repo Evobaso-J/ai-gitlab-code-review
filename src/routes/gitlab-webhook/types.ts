@@ -31,6 +31,7 @@ export type GitLabWebhookHandlerReturnType = Awaited<ReturnType<GitLabWebhookHan
 // #region Errors
 type GitLabErrorName =
     | "MISSING_DIFF"
+    | "EMPTY_DIFF"
     | "MISSING_OLD_FILES"
     | "FAILED_TO_POST_COMMENT"
     | "UNSUPPORTED_EVENT_TYPE"

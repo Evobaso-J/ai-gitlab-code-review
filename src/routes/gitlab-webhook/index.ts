@@ -1,6 +1,6 @@
 import type { FastifyPluginAsync, RequestParamsDefault, RequestQuerystringDefault } from "fastify";
 import { GitLabError, type GitLabFetchHeaders, type GitLabWebhookHandlerReturnType, type SupportedWebhookEvent } from "./types.js";
-import { handlePushHook, handleMergeRequestHook, } from "./hookHandlers.js";
+import { handleMergeRequestHook, } from "./hookHandlers.js";
 import { postAIReview } from "./postAIReview.js";
 
 
@@ -55,13 +55,8 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
                  * 2. The files before the edit
                  */
 
-                if (request.body.object_kind === 'push') {
-                    fastify.gitLabWebhookHandlerResult = await handlePushHook(request.body, {
-                        gitlabUrl,
-                        headers: fastify.gitLabFetchHeaders,
-                    })
-                }
                 if (request.body.object_kind === 'merge_request') {
+                    fastify.log.info('Handling merge request webhook...');
                     fastify.gitLabWebhookHandlerResult = await handleMergeRequestHook(request.body, {
                         gitlabUrl,
                         headers: fastify.gitLabFetchHeaders,
@@ -76,6 +71,8 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
                 reply.code(500).send({ result: fastify.gitLabWebhookHandlerResult });
                 return;
             }
+
+            fastify.log.info('Webhook handled successfully, passing control to AI completion');
             // We return a 200 OK to GitLab to avoid 
             // the webhook to timeout due to the AI completion
             // taking too long

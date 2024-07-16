@@ -32,10 +32,12 @@ export const postAIReview: FastifyPluginAsync =
                     });
                     const AIModel = fastify.env.AI_MODEL;
 
-
+                    fastify.log.info("Generating AI completion...");
                     const completion = await generateAICompletion(messageParams, openaiInstance, AIModel);
                     const answer = buildAnswer(completion);
                     const commentPayload = buildCommentPayload(answer, request.body.object_kind);
+
+                    fastify.log.info("AI completion generated successfully, posting comment on the merge request...");
                     // POST COMMENT ON MERGE REQUEST
                     const aiComment = postAIComment({
                         gitLabBaseUrl,
