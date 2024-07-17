@@ -1,23 +1,27 @@
 {
+  "ts-node": {
+    // https: //github.com/TypeStrong/ts-node/issues/1132#issuecomment-716642560
+    "files": true
+  },
   "extends": "fastify-tsconfig",
-
   // Ref https://www.totaltypescript.com/tsconfig-cheat-sheet
   "compilerOptions": {
     // Base
     "allowJs": true,
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
-
     // Strictness
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedParameters": true,
-
     // Typescript
     "outDir": "dist",
     "sourceMap": true
   },
-  "include": ["src/**/*.ts", "**.d.ts"]
+  "include": [
+    "src/**/*.ts",
+    "**.d.ts"
+  ]
 }

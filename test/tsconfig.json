@@ -4,5 +4,9 @@
     "baseUrl": ".",
     "noEmit": false
   },
-  "include": ["../src/**/*.ts", "**/*.ts"]
+  "include": [
+    "../src/**/*.ts",
+    "**/*.ts",
+    "../fastify.d.ts"
+  ]
 }
