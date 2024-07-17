@@ -9,14 +9,18 @@ export const postAIReview: FastifyPluginAsync =
     async (fastify): Promise<void> => {
 
         fastify.addHook<GitLabWebhookRequest>('onResponse',
-            async (request, _reply) => {
+            async (request, reply) => {
+                if (reply.statusCode !== 200) {
+                    // Do not execute onResponse hook if the response status code is not 200
+                    return
+                }
                 if (request.headers['x-gitlab-token'] !== fastify.env.GITLAB_TOKEN) {
                     fastify.log.error({ error: 'Unauthorized' });
-                    return;
+                    return
                 }
                 if (!request.body) {
                     fastify.log.error({ error: 'Bad Request' });
-                    return;
+                    return
                 }
 
                 if (fastify.gitLabWebhookHandlerResult instanceof Error) throw fastify.gitLabWebhookHandlerResult;
@@ -49,7 +53,6 @@ export const postAIReview: FastifyPluginAsync =
                 } catch (error) {
                     if (error instanceof Error) {
                         fastify.log.error(error.message, error);
-                        return;
                     }
                 }
             })

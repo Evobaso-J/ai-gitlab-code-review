@@ -33,7 +33,7 @@ export const handleMergeRequestHook: GitLabWebhookHandler<WebhookMergeRequestEve
         headers
     });
     if (changes instanceof Error) return changes;
-    if (!changes.diffs || !changes.diffs.length) return new GitLabError({ name: "EMPTY_DIFF", message: "No changes found in the merge request" })
+    if (!changes.diffs || !changes.diffs.length) return new GitLabError({ name: "EMPTY_DIFF", message: "No changes found in the merge request", statusCode: 404 })
 
     const changesOldPaths = changes.diffs.map(diff => diff.old_path)
 

@@ -2,6 +2,7 @@ import type { FastifyPluginAsync, RequestParamsDefault, RequestQuerystringDefaul
 import { GitLabError, type GitLabFetchHeaders, type GitLabWebhookHandlerReturnType, type SupportedWebhookEvent } from "./types.js";
 import { handleMergeRequestHook, } from "./hookHandlers.js";
 import { postAIReview } from "./postAIReview.js";
+import { BaseError } from "../../config/errors.js";
 
 
 export type GitLabWebhookRequest = {
@@ -66,10 +67,12 @@ const gitlabWebhook: FastifyPluginAsync = async (fastify, opts): Promise<void> =
             } catch (error: any) {
                 fastify.gitLabWebhookHandlerResult = error
             }
-            if (fastify.gitLabWebhookHandlerResult instanceof Error) {
-                fastify.log.error(fastify.gitLabWebhookHandlerResult.message, fastify.gitLabWebhookHandlerResult);
-                reply.code(500).send({ result: fastify.gitLabWebhookHandlerResult });
-                return;
+            const { gitLabWebhookHandlerResult } = fastify;
+
+            if (gitLabWebhookHandlerResult instanceof Error) {
+                fastify.log.error(gitLabWebhookHandlerResult.message, gitLabWebhookHandlerResult);
+                const statusCode = gitLabWebhookHandlerResult instanceof BaseError ? gitLabWebhookHandlerResult.statusCode : 500;
+                reply.code(statusCode).send({ result: gitLabWebhookHandlerResult });
             }
 
             fastify.log.info('Webhook handled successfully, passing control to AI completion');
