@@ -20,14 +20,14 @@ process.env.NGROK_TEST_DOMAIN = 'wollano'
 
 // Fill in this config with all the configurations
 // needed for testing the application
-async function config() {
+async function config () {
   return {
-    testing: true,
+    testing: true
   }
 }
 
 // Automatically build and tear down our instance
-async function build(t: TestContext) {
+async function build (t: TestContext) {
   // you can set all the options supported by the fastify CLI command
   const argv = [AppPath]
 
