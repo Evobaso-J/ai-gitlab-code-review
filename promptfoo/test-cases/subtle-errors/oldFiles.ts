@@ -1,5 +1,4 @@
-import type { BuildPromptParameters } from "../../../src/prompt/index.js"
-
+import type { BuildPromptParameters } from '../../../src/prompt/index.js'
 
 const fileContent =
     `
@@ -19,12 +18,11 @@ export function search(nums: number[], target: number): number {
 };
 `
 
-
 const oldFiles: BuildPromptParameters['oldFiles'] = [
-    {
-        fileName: "search.ts",
-        fileContent
-    }
+  {
+    fileName: 'search.ts',
+    fileContent
+  }
 ]
 
 export default oldFiles

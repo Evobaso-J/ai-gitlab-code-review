@@ -1,4 +1,4 @@
-import type { BuildPromptParameters } from "../../../src/prompt/index.js"
+import type { BuildPromptParameters } from '../../../src/prompt/index.js'
 
 const diff = `
 diff --git a/file-deletion/search.ts b/file-deletion/search.ts
@@ -25,9 +25,9 @@ index 0ed552c..0000000
 `
 
 const changes: BuildPromptParameters['changes'] = [
-    {
-        diff
-    }
+  {
+    diff
+  }
 ]
 
-export default changes 
+export default changes

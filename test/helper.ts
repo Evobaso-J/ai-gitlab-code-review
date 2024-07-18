@@ -4,9 +4,9 @@ import * as test from 'node:test'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 
-export type TestContext = {
+export interface TestContext {
   after: typeof test.after
-};
+}
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

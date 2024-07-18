@@ -1,5 +1,4 @@
-import type { BuildPromptParameters } from "../../../src/prompt/index.js"
-
+import type { BuildPromptParameters } from '../../../src/prompt/index.js'
 
 const fileContent =
     `
@@ -28,14 +27,14 @@ export const whereIs13 = search(dataset, 13)
 `
 
 const oldFiles: BuildPromptParameters['oldFiles'] = [
-    {
-        fileName: "search.ts",
-        fileContent
-    },
-    {
-        fileName: "dataset.ts",
-        fileContent: fileContent2
-    }
+  {
+    fileName: 'search.ts',
+    fileContent
+  },
+  {
+    fileName: 'dataset.ts',
+    fileContent: fileContent2
+  }
 ]
 
 export default oldFiles
