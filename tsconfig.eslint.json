@@ -1,0 +1,6 @@
+{
+    // https://typescript-eslint.io/blog/parser-options-project-true/#introducing-true
+    "parserOptions": {
+        "project": true
+    }
+}
