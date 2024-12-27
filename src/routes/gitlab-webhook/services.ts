@@ -30,7 +30,7 @@ export const fetchBranchDiff: GitLabFetchFunction<FetchBranchParams, FetchBranch
   let branchDiff: Response | Error
   try {
     branchDiff = (
-      await fetch(compareUrl, { headers })
+      await fetch(compareUrl, { headers: {...headers} })
     )
   } catch (error: any) {
     branchDiff = error
@@ -63,7 +63,7 @@ export const fetchPreEditFiles: GitLabFetchFunction<FetchPreEditFilesParams, Fet
     oldFiles = await Promise.allSettled(
       oldFilesRequestUrls.map(async (url) => {
         const file = await (
-          await fetch(url, { headers })
+          await fetch(url, { headers: {...headers} })
         ).text()
         return file
       })
