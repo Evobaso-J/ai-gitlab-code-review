@@ -44,13 +44,13 @@ You can use Docker to run the application:
 1. Build the Docker image:
 
 ```
-docker-compose build
+docker compose build
 ```
 
 2. Run the Docker container:
 
 ```
-docker-compose up -d
+docker compose up -d
 ```
 
 ## Usage
